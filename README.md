@@ -11,3 +11,7 @@ python manage.py createsuperuser -> creates an admin account
   
 # How to set up Django in VS Code:  
 https://code.visualstudio.com/docs/python/tutorial-django  
+
+# Useful articles for the future:  
+Instant messaging in Django -> https://tomdekan.com/articles/instant-messenger?ref=rdjango-instant-messenger  
+Django Microsoft login -> https://pypi.org/project/django-microsoft-auth/  
