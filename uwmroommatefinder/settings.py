@@ -11,6 +11,13 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# This tells the library to ignore the "Scope has changed" warning
+os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+
+load_dotenv() # Load environment variables from .env file for microsoft auth
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-k6y12zb8=9wl_z2mcb0_43-*^x5#fw!g3-+g$l2al7^(#p0(*n'
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,7 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # For microsoft auth
+    'microsoft_auth',        # FOr microsoft auth
 ]
+
+SITE_ID = 1 # For microsoft auth
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -62,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'microsoft_auth.context_processors.microsoft',
             ],
         },
     },
@@ -99,6 +111,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# For microsoft auth, allows users to log in with their Microsoft account
+AUTHENTICATION_BACKENDS = [
+    'microsoft_auth.backends.MicrosoftAuthenticationBackend', # Adds Microsoft login
+    'django.contrib.auth.backends.ModelBackend', # Keeps normal admin login working
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -116,3 +134,26 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# MICROSOFT AUTH CONFIGURATION
+# The library looks for these exact variable names
+MICROSOFT_AUTH_CLIENT_ID = os.getenv("MICROSOFT_APP_ID")
+MICROSOFT_AUTH_CLIENT_SECRET = os.getenv("MICROSOFT_APP_SECRET")
+MICROSOFT_AUTH_TENANT_ID = "common"  # Use "common" for multi-tenant apps
+
+# Login Type
+MICROSOFT_AUTH_LOGIN_TYPE = "ma"  # Microsoft Account (includes Personal & School)
+
+# Domain restriction (The "UWM Only" guard)
+# The library uses a validator function for this, not a simple list.
+# We will add a validator to check the email domain.
+MICROSOFT_AUTH_EXTRA_SCOPES = "user.read"
+
+def validate_uwm_email(user, token=None):
+    if not user.email.endswith("@uwm.edu"):
+        from django.core.exceptions import PermissionDenied
+        raise PermissionDenied("Only UWM email addresses are allowed.")
+
+# Tell the library to use this validator
+MICROSOFT_AUTH_AUTHENTICATE_HOOK = "uwmroommatefinder.settings.validate_uwm_email" 
+# ^ Change 'your_project_name' to the name of the folder containing settings.py
