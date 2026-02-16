@@ -157,3 +157,14 @@ def validate_uwm_email(user, token=None):
 # Tell the library to use this validator
 MICROSOFT_AUTH_AUTHENTICATE_HOOK = "uwmroommatefinder.settings.validate_uwm_email" 
 # ^ Change 'your_project_name' to the name of the folder containing settings.py
+
+
+
+# URL to redirect to after successful logout (e.g., the home page or login page)
+LOGOUT_REDIRECT_URL = '/'
+
+# URL to redirect to after successful login (e.g., a specific dashboard)
+LOGIN_REDIRECT_URL = '/' 
+
+# Default URL for login, used by login_required decorator
+LOGIN_URL = '/'
