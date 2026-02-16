@@ -5,8 +5,12 @@
         <title>Home</title>
     </head>
     <body>
-        <h1>Welcome to the homepage!</h1>
-        <button>Login</button>
+        {% if current_user.is_authenticated %}
+            <h1>Hello, {{ current_user.first_name }}!</h1>
+        {% endif %}
+        <a href="/microsoft/to-auth-redirect/" style="text-decoration: none;">
+            <button>Login</button>
+        </a>
         <Button>Logout</Button>
     </body>
 </html>
