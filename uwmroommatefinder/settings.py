@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',  # For microsoft auth
     'microsoft_auth',        # FOr microsoft auth
+    'corsheaders',       # React to talk to Django backend
+    'rest_framework',    # React to talk to Django backend
 ]
 
 SITE_ID = 1 # For microsoft auth
@@ -54,6 +56,7 @@ SITE_ID = 1 # For microsoft auth
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -156,9 +159,15 @@ def validate_uwm_email(user, token=None):
 
 # Tell the library to use this validator
 MICROSOFT_AUTH_AUTHENTICATE_HOOK = "uwmroommatefinder.settings.validate_uwm_email" 
-# ^ Change 'your_project_name' to the name of the folder containing settings.py
 
+# Tells Django to trust requests from the React frontend (for development purposes)
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 
+CORS_ALLOW_CREDENTIALS = True # Allows cookies to be sent to and from port 8000 and 5173
+# which is necessary for authentication to work in development.
 
 # URL to redirect to after successful logout (e.g., the home page or login page)
 LOGOUT_REDIRECT_URL = '/'

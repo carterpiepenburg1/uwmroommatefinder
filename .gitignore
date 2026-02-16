@@ -1,4 +1,4 @@
 .env
-base/__pycache__/
-uwmroommatefinder/__pycache__/
+/pycache/*
+__pycache__/
 db.sqlite3
