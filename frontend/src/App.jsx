@@ -4,6 +4,8 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Matches from "./pages/Matches";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import './styles/App.css';
 
 function App() {
@@ -15,10 +17,34 @@ function App() {
 
         {/* All pages with sidebar */}
         <Route element={<Layout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path ="/profile" element={<Profile />} />
-          <Route path="/matches" element={<Matches />} />
-        </Route>
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/matches"
+          element={
+            <ProtectedRoute>
+              <Matches />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
       </Routes>
     </BrowserRouter>
   );
