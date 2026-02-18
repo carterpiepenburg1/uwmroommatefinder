@@ -1,0 +1,65 @@
+/* Login.css - Dark Mode Version */
+
+
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  /* CHANGED: Very dark grey background */
+  background-color: #121212;
+}
+
+.login-card {
+  /* CHANGED: Dark grey card to pop against the background */
+  background: #1e1e1e;
+  padding: 3rem;
+  border-radius: 12px;
+  /* ADJUSTED: Stronger shadow for better depth in dark mode */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  /* OPTIONAL: Subtle border for definition */
+  border: 1px solid #333;
+  max-width: 450px;
+  width: 90%;
+  text-align: center;
+}
+
+.info-blurb {
+  /* CHANGED: Slightly lighter dark grey to differentiate from card */
+  background-color: #2d2d2d;
+  padding: 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  /* CHANGED: Light grey text for readability */
+  color: #d0d0d0;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* BUTTON REMAINS UWM GOLD */
+.login-btn {
+  background-color: #FFBD00; /* UWM Gold */
+  color: #000000; /* Black text still looks best on gold */
+  font-weight: bold;
+  border: none;
+  padding: 14px 28px;
+  font-size: 1.1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  width: 100%;
+}
+
+.login-btn:hover {
+  background-color: #dda400; /* Slightly darker gold on hover */
+  transform: translateY(-2px); /* Slight lift effect */
+  /* ADJUSTED: Gold glow effect on hover */
+  box-shadow: 0 4px 15px rgba(255, 189, 0, 0.4);
+}
