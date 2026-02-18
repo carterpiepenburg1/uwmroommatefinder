@@ -1,5 +1,6 @@
 // Dashboard.jsx
 import React, { useState, useEffect } from 'react';
+import Layout from "../components/Layout.jsx";
 
 const Dashboard = () => {
   // Initialize with a safe default
@@ -18,19 +19,20 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div style={{ color: "white", padding: "20px" }}>
-      <h1>Dashboard</h1>
-      
-      {/* Logic: If we have a first name, show "Welcome, Max!". 
-         Otherwise, show "Welcome, max@uwm.edu!" 
-      */}
-      <p>
-        Welcome, {user.first_name ? user.first_name : user.email}!
-      </p>
-      
-      {/* Show full details for debugging */}
-      <small>Full Name: {user.first_name} {user.last_name}</small>
-    </div>
+      <div style={{ color: "white", padding: "20px" }}>
+        
+        <h1>Dashboard</h1>
+        
+        {/* Logic: If we have a first name, show "Welcome, Max!". 
+          Otherwise, show "Welcome, max@uwm.edu!" 
+        */}
+        <p>
+          Welcome, {user.first_name ? user.first_name : user.email}!
+        </p>
+        
+        {/* Show full details for debugging */}
+        <small>Full Name: {user.first_name} {user.last_name}</small>
+      </div>
   );
 };
 

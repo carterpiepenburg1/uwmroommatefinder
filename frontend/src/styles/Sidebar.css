@@ -1,0 +1,35 @@
+.sidebar {
+  width: 240px;
+  height: 100vh; /* Full viewport height */
+  background-color: #111827; /* Dark navy */
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+  position: fixed; /* Keeps it locked on the left */
+  top: 0;
+  left: 0;
+}
+
+.logo {
+  margin-bottom: 40px;
+  font-size: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin-bottom: 20px;
+}
+
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.sidebar a:hover {
+  color: #60a5fa; /* Soft blue hover */
+}
