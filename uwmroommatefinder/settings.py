@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'microsoft_auth',        # FOr microsoft auth
     'corsheaders',       # React to talk to Django backend
     'rest_framework',    # React to talk to Django backend
+    'storages',          # Google Cloud Storage (Firebase) file backend
 ]
 
 SITE_ID = 1 # For microsoft auth
@@ -87,11 +88,16 @@ WSGI_APPLICATION = 'uwmroommatefinder.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+# PostgreSQL — run the DB via Docker Compose: `docker compose up -d db`
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'uwmroommatefinder'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
@@ -177,3 +183,28 @@ LOGIN_REDIRECT_URL = '/'
 
 # Default URL for login, used by login_required decorator
 LOGIN_URL = '/'
+
+
+# ---------------------------------------------------------------------------
+# Google Cloud Storage (Firebase Storage) — file / media uploads
+# ---------------------------------------------------------------------------
+# Docs: https://django-storages.readthedocs.io/en/latest/backends/gcloud.html
+#
+# Prerequisites:
+#   1. pip install -r requirements.txt  (includes django-storages[google] + google-cloud-storage)
+#   2. Download a service-account JSON key from Firebase Console →
+#      Project Settings → Service Accounts → Generate new private key
+#   3. Set GS_CREDENTIALS and GS_BUCKET_NAME in your .env file
+
+DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+
+GS_BUCKET_NAME = os.getenv('GS_BUCKET_NAME', '')          # e.g. 'uwm-roommate-media'
+GS_CREDENTIALS = os.getenv('GS_CREDENTIALS', '')           # abs path to service-account.json
+
+# Public URL prefix for serving stored files
+MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/' if GS_BUCKET_NAME else '/media/'
+
+# Cache-Control header for uploaded objects (1 day)
+GS_OBJECT_PARAMETERS = {
+    'cache_control': 'public, max-age=86400',
+}
