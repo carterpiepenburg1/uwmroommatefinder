@@ -1,17 +1,44 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import '../styles/Layout.css';
 
 function Layout() {
+  const location = useLocation();
+
+  const getPageTitle = () => {
+    switch (location.pathname) {
+      case "/dashboard":
+        return "Dashboard";
+      case "/profile":
+        return "Profile";
+      case "/matches":
+        return "Matches";
+      default:
+        return "";
+    }
+  };
+
   return (
     <div className="layout">
       <Sidebar />
 
-      <div className="main-content">
-        <Outlet />
+      <div className="content-wrapper">
+        <header className="topbar">
+          <h2>{getPageTitle()}</h2>
+        </header>
+
+        <main className="main-content">
+          <Outlet />
+        </main>
+
+        <footer className="footer">
+          © {new Date().getFullYear()} UWM Roommate Finder. All rights reserved.
+        </footer>
       </div>
     </div>
   );
 }
 
 export default Layout;
+
+
