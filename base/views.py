@@ -1,15 +1,20 @@
-import datetime
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import JsonResponse
+from django.contrib.auth import logout
+from django.views.decorators.csrf import csrf_exempt
 
-def home(request):
 
-    current_user = request.user
+@csrf_exempt
+def logout_view(request):
+    logout(request)
+    return JsonResponse({"message": "Logged out successfully"})
 
-    return render(
-        request,
-        'base/home.html',
-        {
-            'current_user': current_user
-        }
-    )
+
+def current_user(request):
+    if request.user.is_authenticated:
+        return JsonResponse({
+            'username': request.user.username,  # also email
+            'email': request.user.email,
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+        })
+    return JsonResponse({"error": "Not authenticated"}, status=401)

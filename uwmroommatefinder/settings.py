@@ -55,6 +55,7 @@ INSTALLED_APPS = [
 SITE_ID = 1 # For microsoft auth
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -170,6 +171,7 @@ MICROSOFT_AUTH_AUTHENTICATE_HOOK = "uwmroommatefinder.settings.validate_uwm_emai
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://localhost:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True # Allows cookies to be sent to and from port 8000 and 5173
