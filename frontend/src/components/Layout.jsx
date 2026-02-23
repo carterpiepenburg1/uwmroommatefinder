@@ -13,6 +13,8 @@ function Layout() {
         return "Profile";
       case "/matches":
         return "Matches";
+      case "/chat":
+        return "Chat";
       default:
         return "";
     }

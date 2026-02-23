@@ -1,6 +1,5 @@
 // Dashboard.jsx
 import React, { useState, useEffect } from 'react';
-import Layout from "../components/Layout.jsx";
 
 const Dashboard = () => {
   // Initialize with a safe default
