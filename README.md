@@ -15,6 +15,13 @@ python manage.py makemigrations -> prepares migrations
 python manage.py migrate -> migrates prepared migrations  
 
 pip install -r requirements.txt -> installs required packages
+
+# Start the migration from SQLite to PostgreSQL
+Set env variables
+pip install -r requirements.txt
+have docker desktop open
+docker compose up -d db
+python manage.py migrate or makemigration
    
 # How to set up Django in VS Code:  
 https://code.visualstudio.com/docs/python/tutorial-django  
