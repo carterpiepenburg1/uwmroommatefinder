@@ -2,12 +2,12 @@ import { useEffect } from "react";
 
 function Matches() {
   useEffect(() => {
-    document.title = "Matches | Roommate Finder";
+    document.title = "Explore and Coonect | Roommate Finder";
   }, []);
 
   return (
     <div>
-      <h1>Your Matches</h1>
+      <h1>Explore and Connect</h1>
       <p>Here are your potential roommates.</p>
 
       <div style={{ marginTop: "20px" }}>
