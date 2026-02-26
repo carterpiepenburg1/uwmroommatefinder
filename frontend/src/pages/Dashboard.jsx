@@ -23,7 +23,7 @@ const Dashboard = () => {
         <h1>Dashboard</h1>
         
         {/* Logic: If we have a first name, show "Welcome, Max!". 
-          Otherwise, show "Welcome, max@uwm.edu!" 
+          Otherwise, show "Welcome, maxkrug@uwm.edu!" 
         */}
         <p>
           Welcome, {user.first_name ? user.first_name : user.email}!
