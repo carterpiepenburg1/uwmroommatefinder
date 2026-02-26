@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
+from django.db.models.signals import post_delete
 
 class Program(models.TextChoices):
     AAS_FLEX = 'AAS_FLEX', 'AAS Flexible Option'
@@ -280,17 +281,47 @@ class DormBuilding(models.TextChoices):
     sandburgnsw = 'S1', 'Sandburg (N/S/W)'
     sandburge = 'S2', 'Sandburg (E)'
 
+class Gender(models.TextChoices):
+    MALE = 'M', 'Male'
+    FEMALE = 'F', 'Female'
+    #UWM offers inclusive housing where some floors/suites are gender-neutral
+    OTHER = 'O', 'Other'
+
+class Standing(models.TextChoices):
+    freshman = 'FR', 'Freshman'
+    sophomore = 'SO', 'Sophomore'
+    junior = 'JR', 'Junior'
+    senior = 'SR', 'Senior'
+
 class RoomType(models.TextChoices):
     single = 'S', 'Single'
     double = 'D', 'Double'
     triple = 'T', 'Triple'
 
+class Group(models.Model):
+    
+    #ADD GROUP SPECIFIC FIELDS HERE
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name or f"Group {self.id}"
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    #ADD ALL CUSTOM FIELDS HERE
+    #Required fields (should not have to edit after initial profile setup)
     programs = models.JSONField(default=list, blank=True)
+    gender = models.CharField(max_length=2,choices=Gender.choices,default=Gender.OTHER)
+    standing = models.CharField(max_length=2,choices=Standing.choices,default=Standing.freshman)
+    term = models.CharField(max_length=2,choices=Term.choices,default=Term.fall)
+
+    #Preferences
+    dorm_building = models.CharField(max_length=2,choices=DormBuilding.choices,default=DormBuilding.cambridge)
+    room_type = models.CharField(max_length=2,choices=RoomType.choices,default=RoomType.single)
     preferences = models.JSONField(default=dict, blank=True)
+
+    #Group
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, related_name='members', null=True, blank=True)
 
     def __str__(self):
         return self.user.username
@@ -299,9 +330,19 @@ class Profile(models.Model):
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
+        new_group = Group.objects.create(name=f"{instance.username}'s Group")
+        Profile.objects.create(user=instance, group=new_group)
 
 #Automatically saves profiles when you save User changes
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+#Delete groups when a user is deleted and they were the only member
+@receiver(post_delete, sender=Profile)
+def delete_empty_group(sender, instance, **kwargs):
+    group = instance.group
+    if group:
+        # Check if anyone else is still in this group
+        if not group.members.exists():
+            group.delete()
