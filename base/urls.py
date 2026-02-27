@@ -2,6 +2,7 @@ from django.urls import path
 from base import views
 
 urlpatterns = [
+    path("", views.root_redirect, name="root_redirect"),
     path('api/current_user/', views.current_user, name='current_user'),
     path("api/me/", views.current_user, name="current_user"),
     path("api/logout/", views.logout_view, name="logout"),
