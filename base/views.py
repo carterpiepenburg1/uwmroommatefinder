@@ -16,5 +16,6 @@ def current_user(request):
             'email': request.user.email,
             'first_name': request.user.first_name,
             'last_name': request.user.last_name,
+            'gender': request.user.profile.get_gender_display(),
         })
     return JsonResponse({"error": "Not authenticated"}, status=401)
