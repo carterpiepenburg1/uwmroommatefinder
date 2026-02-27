@@ -210,3 +210,16 @@ MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/' if GS_BUCKET_NAM
 GS_OBJECT_PARAMETERS = {
     'cache_control': 'public, max-age=86400',
 }
+
+
+# ---------------------------------------------------------------------------
+# Firebase Admin SDK Initialization
+# ---------------------------------------------------------------------------
+if GS_CREDENTIALS and os.path.exists(GS_CREDENTIALS):
+    import firebase_admin
+    from firebase_admin import credentials
+    
+    # Check if app is already initialized to avoid "app already exists" error
+    if not firebase_admin._apps:
+        cred = credentials.Certificate(GS_CREDENTIALS)
+        firebase_admin.initialize_app(cred)
