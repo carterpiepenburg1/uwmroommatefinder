@@ -163,6 +163,15 @@ def validate_uwm_email(user, token=None):
     if not user.email.endswith("@uwm.edu"):
         from django.core.exceptions import PermissionDenied
         raise PermissionDenied("Only UWM email addresses are allowed.")
+    
+    # Check for admin promotion
+    admin_emails_str = os.getenv("ADMIN_EMAILS", "")
+    admin_emails = [email.strip().lower() for email in admin_emails_str.split(",") if email.strip()]
+    
+    if user.email.lower() in admin_emails:
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
 
 # Tell the library to use this validator
 MICROSOFT_AUTH_AUTHENTICATE_HOOK = "uwmroommatefinder.settings.validate_uwm_email" 
@@ -180,11 +189,11 @@ CORS_ALLOW_CREDENTIALS = True # Allows cookies to be sent to and from port 8000 
 # URL to redirect to after successful logout (e.g., the home page or login page)
 LOGOUT_REDIRECT_URL = '/'
 
-# URL to redirect to after successful login (e.g., a specific dashboard)
-LOGIN_REDIRECT_URL = '/' 
-
 # Default URL for login, used by login_required decorator
-LOGIN_URL = '/'
+LOGIN_URL = '/accounts/login/'
+
+# URL to redirect to after successful login
+LOGIN_REDIRECT_URL = '/'
 
 
 # ---------------------------------------------------------------------------
