@@ -6,59 +6,62 @@ import Matches from "./pages/Matches";
 import Chat from "./pages/Chat";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ChatProvider } from "./context/ChatContext";
 
 import './styles/App.css';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Login page (no sidebar) */}
-        <Route path="/" element={<Login />} />
+    <ChatProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Login page (no sidebar) */}
+          <Route path="/" element={<Login />} />
 
-        {/* All pages with sidebar */}
-        <Route element={<Layout />}>
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+          {/* All pages with sidebar */}
+          <Route element={<Layout />}>
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/matches"
-            element={
-              <ProtectedRoute>
-                <Matches />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/chat"
-            element={
-              <ProtectedRoute>
-                <Chat />
-              </ProtectedRoute>
-            }
-          />
-        </Route>
+            <Route
+              path="/matches"
+              element={
+                <ProtectedRoute>
+                  <Matches />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/chat"
+              element={
+                <ProtectedRoute>
+                  <Chat />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
 
-        {/* Redirect /admin to the backend admin panel */}
-        <Route path="/admin" element={<NavigateToAdmin />} />
+          {/* Redirect /admin to the backend admin panel */}
+          <Route path="/admin" element={<NavigateToAdmin />} />
 
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </ChatProvider>
   );
 }
 
@@ -68,4 +71,3 @@ const NavigateToAdmin = () => {
 };
 
 export default App;
-
