@@ -6,4 +6,6 @@ urlpatterns = [
     path('api/current_user/', views.current_user, name='current_user'),
     path("api/me/", views.current_user, name="current_user"),
     path("api/logout/", views.logout_view, name="logout"),
+    path("api/chat/token/", views.get_firebase_token, name="chat_token"),
+    path("api/chat/init/", views.initiate_conversation, name="chat_init"),
 ]
