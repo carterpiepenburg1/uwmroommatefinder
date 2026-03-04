@@ -309,18 +309,21 @@ class Group(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    #Required fields (should not have to edit after initial profile setup)
-    programs = models.JSONField(default=list, blank=True)
-    gender = models.CharField(max_length=2,choices=Gender.choices,default=Gender.OTHER)
-    standing = models.CharField(max_length=2,choices=Standing.choices,default=Standing.freshman)
-    term = models.CharField(max_length=2,choices=Term.choices,default=Term.fall)
+    # Have they filled out the form
+    is_profile_complete = models.BooleanField(default=False)
 
-    #Preferences
-    dorm_building = models.CharField(max_length=2,choices=DormBuilding.choices,default=DormBuilding.cambridge)
-    room_type = models.CharField(max_length=2,choices=RoomType.choices,default=RoomType.single)
+    # Required fields (blank by default))
+    programs = models.JSONField(default=list, blank=True)
+    gender = models.CharField(max_length=2, choices=Gender.choices, null=True, blank=True)
+    standing = models.CharField(max_length=2, choices=Standing.choices, null=True, blank=True)
+    term = models.CharField(max_length=2, choices=Term.choices, null=True, blank=True)
+
+    # Preferences (blank by default)
+    dorm_building = models.CharField(max_length=2, choices=DormBuilding.choices, null=True, blank=True)
+    room_type = models.CharField(max_length=2, choices=RoomType.choices, null=True, blank=True)
     preferences = models.JSONField(default=dict, blank=True)
 
-    #Group
+    # Group
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, related_name='members', null=True, blank=True)
 
     def __str__(self):

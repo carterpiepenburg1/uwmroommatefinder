@@ -1,56 +1,50 @@
-import React, { useState, useEffect } from "react"; // 1. Don't forget the imports!
-import "../styles/Profilecard.css";
+import { useEffect, useState } from "react";
+import "../styles/ProfileCard.css";
 
-function Profilecard({
-  // Default props if no data is passed from a parent
-  major = "Computer Science",
-  year = "Junior",
-  bio = "Friendly, organized, and looking for a chill roommate.",
-  lifestyle = "Night Owl",
-  interests = ["Cooking", "Hiking", "Netflix"],
-  image = "https://via.placeholder.com/150",
-}) {
-  // 2. Move state and effects INSIDE the function
-  const [user, setUser] = useState({ first_name: '', last_name: '', email: '' });
+export default function ProfileCard() {
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/current_user/', {
-      method: 'GET',
-      credentials: 'include', 
+    fetch("http://localhost:8000/api/current_user/", {
+      credentials: "include",
     })
-    .then(response => response.json())
-    .then(data => {
-      setUser(data); 
-    })
-    .catch(error => console.error("Error:", error));
+      .then((res) => res.json())
+      .then((data) => setUser(data))
+      .catch((err) => console.error("Error fetching user:", err));
   }, []);
 
-  // 3. Logic for the name (using the state variable 'user')
-  const displayName = user.first_name ? user.first_name : user.email;
+  if (!user) return <div className="loading">Loading...</div>;
 
   return (
-    <div className="profile-card">
-      <div className="profile-left">
-        <img src={image} alt={displayName} className="profile-image" />
-      </div>
+    <div className="profile-container">
+      <div className="profile-card">
+        <h2 className="profile-name">{user.name}</h2>
 
-      <div className="profile-right">
-        <h3 className="profile-name">{displayName}</h3>
-        <p className="profile-meta">
-          {major} • {year}
-        </p>
-        <p className="profile-bio">{bio}</p>
-        <div className="profile-tags">
-          <span className="tag lifestyle">{lifestyle}</span>
-          {interests.map((interest, index) => (
-            <span key={index} className="tag interest">
-              {interest}
-            </span>
-          ))}
+        <div className="profile-section">
+          <p><strong>Name:</strong> {user.first_name || "N/A"} {user.last_name || "N/A"}</p>
+          <p><strong>Program(s):</strong> {user.programs_display || "N/A"}</p>
+          <p><strong>Gender:</strong> {user.gender_display || "N/A"}</p>
+          <p><strong>Standing:</strong> {user.standing_display || "N/A"}</p>
+          <p><strong>Dorm:</strong> {user.dorm_building_display || "N/A"}</p>
+          <p><strong>Room Type:</strong> {user.room_type_display || "N/A"}</p>
+        </div>
+
+        <div className="profile-section">
+          <strong>Preferences:</strong>
+          <ul>
+            {user.preferences &&
+            Object.keys(user.preferences).length > 0 ? (
+              Object.entries(user.preferences).map(([key, value]) => (
+                <li key={key}>
+                  {key.replaceAll("_", " ")}: {value}
+                </li>
+              ))
+            ) : (
+              <li>No preferences set</li>
+            )}
+          </ul>
         </div>
       </div>
     </div>
   );
 }
-
-export default Profilecard;
