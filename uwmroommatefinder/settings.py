@@ -164,13 +164,16 @@ def validate_uwm_email(user, token=None):
         from django.core.exceptions import PermissionDenied
         raise PermissionDenied("Only UWM email addresses are allowed.")
     
-    # Check for admin promotion
+    # Always sync admin status with the ADMIN_EMAILS env var on every login.
+    # This means adding OR removing an email from .env takes effect immediately
+    # on next login — no manual DB edits needed.
     admin_emails_str = os.getenv("ADMIN_EMAILS", "")
     admin_emails = [email.strip().lower() for email in admin_emails_str.split(",") if email.strip()]
     
-    if user.email.lower() in admin_emails:
-        user.is_staff = True
-        user.is_superuser = True
+    is_admin = user.email.lower() in admin_emails
+    if user.is_staff != is_admin or user.is_superuser != is_admin:
+        user.is_staff = is_admin
+        user.is_superuser = is_admin
         user.save()
 
 # Tell the library to use this validator
