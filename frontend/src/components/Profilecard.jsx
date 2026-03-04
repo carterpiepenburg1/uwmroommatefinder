@@ -22,11 +22,11 @@ export default function ProfileCard() {
 
         <div className="profile-section">
           <p><strong>Name:</strong> {user.first_name || "N/A"} {user.last_name || "N/A"}</p>
-          <p><strong>Program(s):</strong> {user.programs || "N/A"}</p>
-          <p><strong>Gender:</strong> {user.gender || "N/A"}</p>
-          <p><strong>Standing:</strong> {user.standing || "N/A"}</p>
-          <p><strong>Dorm:</strong> {user.dorm_building || "N/A"}</p>
-          <p><strong>Room Type:</strong> {user.room_type || "N/A"}</p>
+          <p><strong>Program(s):</strong> {user.programs_display || "N/A"}</p>
+          <p><strong>Gender:</strong> {user.gender_display || "N/A"}</p>
+          <p><strong>Standing:</strong> {user.standing_display || "N/A"}</p>
+          <p><strong>Dorm:</strong> {user.dorm_building_display || "N/A"}</p>
+          <p><strong>Room Type:</strong> {user.room_type_display || "N/A"}</p>
         </div>
 
         <div className="profile-section">

@@ -1,0 +1,64 @@
+/* Login.css */
+
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  /* Technically the text color lol */
+  background-color: #202020;
+}
+
+.form-card {
+  /* Black - light */
+  background: #333333;
+  padding: 3rem;
+  border-radius: 12px;
+  /* Drop Shadow */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  /* Black - lighter */
+  border: 1px solid #999999;
+  max-width: 450px;
+  width: 90%;
+  text-align: center;
+}
+
+.info-blurb {
+  /* Background Gray - dark */
+  background-color: #202020;
+  padding: 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  /* UWM White */
+  color: #ffffff;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* BUTTON REMAINS UWM GOLD */
+.form-btn {
+  background-color: #FFBD00; /* UWM Gold */
+  color: #000000;
+  font-weight: bold;
+  border: none;
+  padding: 14px 28px;
+  font-size: 1.1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  width: 100%;
+}
+
+.form-btn:hover {
+  /* CHANGED: Official UWM Gold - light for the hover state */
+  background-color: #ffd14c; 
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 189, 0, 0.4);
+}
