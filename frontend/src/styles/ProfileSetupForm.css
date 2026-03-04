@@ -10,10 +10,7 @@
 .app-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  /* Technically the text color lol */
-  background-color: #202020;
+  background-color: #333333;
 }
 
 .form-card {
@@ -61,4 +58,8 @@
   background-color: #ffd14c; 
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(255, 189, 0, 0.4);
+}
+
+label {
+  color: white;
 }
