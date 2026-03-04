@@ -12,7 +12,7 @@ def set_site_domain(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0004_group_profile_group'),
+        ('base', '0005_profile_is_profile_complete_and_more'),
         ('sites', '0002_alter_domain_unique'),
     ]
 
