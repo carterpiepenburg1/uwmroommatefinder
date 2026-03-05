@@ -9,26 +9,31 @@
 }
 
 .app-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  /* CHANGED: Very dark grey background */
-  background-color: #121212;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* Changed background to UWM Sandburg halls */
+    background-image: url('../../public/UWMLogos/Primary/residencehalls.png');
+    background-size: cover;
 }
 
 .login-card {
-  /* CHANGED: Dark grey card to pop against the background */
-  background: #1e1e1e;
-  padding: 3rem;
-  border-radius: 12px;
-  /* ADJUSTED: Stronger shadow for better depth in dark mode */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  /* OPTIONAL: Subtle border for definition */
-  border: 1px solid #333;
-  max-width: 450px;
-  width: 90%;
-  text-align: center;
+    /* CHANGED: Dark grey card to pop against the background */
+    background: #000000;
+    padding: 3rem;
+    border-radius: 12px;
+    /* ADJUSTED: Stronger shadow for better depth in dark mode */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    /* OPTIONAL: Subtle border for definition */
+    border: 1px solid #333;
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+}
+
+.login-card h1 {
+    color: #FFFFFF;
 }
 
 .info-blurb {
