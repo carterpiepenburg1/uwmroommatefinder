@@ -1,4 +1,7 @@
-/* Login.css */
+/* Login.css - Dark Mode Version */
+
+/* Import for Roboto font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 #root {
   width: 100%;
@@ -8,26 +11,43 @@
 }
 
 .app-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  /* Technically the text color lol */
-  background-color: #202020;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* Changed background to UWM Sandburg halls */
+    background-image: url('../../public/UWMLogos/Primary/residencehalls.png');
+    background-size: cover;
+    /* Using Roboto font UWM's standard font */
+    font-family: "Roboto", sans-serif;
+
+}
+
+/* Ensure the logo isn't impacted by the link */
+.logo-container a {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
 }
 
 .login-card {
-  /* Black - light */
-  background: #333333;
-  padding: 3rem;
-  border-radius: 12px;
-  /* Drop Shadow */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  /* Black - lighter */
-  border: 1px solid #999999;
-  max-width: 450px;
-  width: 90%;
-  text-align: center;
+    /* Changed the Login card background to Black to keep the Black/Gold aesthetic */
+    background: #000000;
+    padding: 3rem;
+    border-radius: 12px;
+    /* ADJUSTED: Stronger shadow for better depth in dark mode */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    /* OPTIONAL: Subtle border for definition */
+    border: 1px solid #333;
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+}
+
+/* Changed the color of header text to white */
+.login-card h1 {
+    color: #FFFFFF;
 }
 
 .info-blurb {
