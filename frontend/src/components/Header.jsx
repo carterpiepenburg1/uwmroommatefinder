@@ -1,31 +1,27 @@
-import React from 'react';
 import '../styles/Header.css';
 import UWM_Logo from  '../../public/UWMLogos/Primary/UWM Primary Logo_Full Color on Light.png'
 
 const Header = () => {
   return (
-    <header className="uwm-header">
-      {/* Top Utility Bar */}
-      <div className="utility-bar">
-        <nav className="utility-links">
-          <a href="#canvas">Canvas</a>
-          <a href="#paws">PAWS</a>
-          <a href="#panthermail">PantherMail</a>
-        </nav>
-      </div>
+      <header className="uwm-header">
+          {/* Top Utility Bar */}
+          <div className="utility-bar">
+              <nav className="utility-links">
+                  <a href="https://uwmil.instructure.com/login/saml/15">Canvas</a>
+                  <a href="https://www.uwm.sis.wisconsin.edu/milprd-login">PAWS</a>
+                  <a href="http://login.microsoftonline.com/">Microsoft 365</a>
+                  <a href="https://uwm.starrezhousing.com/StarRezPortalX/4CDDDF11/1/1/Home-Home?UrlToken=9527B353">Housing portal</a>
+                  <a href="https://uwm.hed.boldyn.com/">Wifi Portal</a>
+              </nav>
+          </div>
 
-      {/* Main Brand Bar */}
-      <div className="brand-bar">
-        <div className="logo-container">
-          <img src={UWM_Logo} alt="UWM Logo" className="header-logo"/>
-        </div>
-
-        <nav className="main-navigation">
-          <button className="search-btn">Search</button>
-          <button className="menu-btn">Menu</button>
-        </nav>
-      </div>
-    </header>
+          {/* Main Brand Bar */}
+          <div className="brand-bar">
+              <div className="logo-container">
+                  <img src={UWM_Logo} alt="UWM Logo" className="header-logo"/>
+              </div>
+          </div>
+      </header>
   );
 };
 
