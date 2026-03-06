@@ -23,6 +23,14 @@
 
 }
 
+/* Ensure the logo isn't impacted by the link */
+.logo-container a {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+}
+
 .login-card {
     /* Changed the Login card background to Black to keep the Black/Gold aesthetic */
     background: #000000;

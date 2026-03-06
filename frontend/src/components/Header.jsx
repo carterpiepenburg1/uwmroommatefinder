@@ -1,4 +1,5 @@
 import '../styles/Header.css';
+import { Link } from 'react-router-dom'
 import UWM_Logo from  '../../public/UWMLogos/Primary/UWM Primary Logo_Full Color on Light.png'
 
 const Header = () => {
@@ -18,7 +19,9 @@ const Header = () => {
           {/* Main Brand Bar */}
           <div className="brand-bar">
               <div className="logo-container">
+                  <Link to="https://uwm.edu">
                   <img src={UWM_Logo} alt="UWM Logo" className="header-logo"/>
+                  </Link>
               </div>
           </div>
       </header>
