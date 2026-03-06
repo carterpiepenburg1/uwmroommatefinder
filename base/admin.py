@@ -1,7 +1,24 @@
+from django import forms
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
+from .models import Profile, Program
+from django.contrib.admin.widgets import FilteredSelectMultiple
 
-from .models import Profile
+class ProfileAdminForm(forms.ModelForm):
+    programs = forms.MultipleChoiceField(
+        choices=Program.choices,
+        widget=FilteredSelectMultiple("Programs", is_stacked=False),
+        required=False
+    )
 
-admin.site.register(Profile)
+    class Media:
+        css = {'all': ('admin/css/widgets.css',)}
+        js = ('/admin/jsi18n/',)
+
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+@admin.register(Profile)
+
+class ProfileAdmin(admin.ModelAdmin):
+    form = ProfileAdminForm

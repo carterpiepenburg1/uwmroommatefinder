@@ -163,6 +163,18 @@ def validate_uwm_email(user, token=None):
     if not user.email.endswith("@uwm.edu"):
         from django.core.exceptions import PermissionDenied
         raise PermissionDenied("Only UWM email addresses are allowed.")
+    
+    # Always sync admin status with the ADMIN_EMAILS env var on every login.
+    # This means adding OR removing an email from .env takes effect immediately
+    # on next login — no manual DB edits needed.
+    admin_emails_str = os.getenv("ADMIN_EMAILS", "")
+    admin_emails = [email.strip().lower() for email in admin_emails_str.split(",") if email.strip()]
+    
+    is_admin = user.email.lower() in admin_emails
+    if user.is_staff != is_admin or user.is_superuser != is_admin:
+        user.is_staff = is_admin
+        user.is_superuser = is_admin
+        user.save()
 
 # Tell the library to use this validator
 MICROSOFT_AUTH_AUTHENTICATE_HOOK = "uwmroommatefinder.settings.validate_uwm_email" 
@@ -180,11 +192,11 @@ CORS_ALLOW_CREDENTIALS = True # Allows cookies to be sent to and from port 8000 
 # URL to redirect to after successful logout (e.g., the home page or login page)
 LOGOUT_REDIRECT_URL = '/'
 
-# URL to redirect to after successful login (e.g., a specific dashboard)
-LOGIN_REDIRECT_URL = '/' 
-
 # Default URL for login, used by login_required decorator
-LOGIN_URL = '/'
+LOGIN_URL = '/accounts/login/'
+
+# URL to redirect to after successful login
+LOGIN_REDIRECT_URL = '/'
 
 
 # ---------------------------------------------------------------------------
@@ -210,3 +222,16 @@ MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/' if GS_BUCKET_NAM
 GS_OBJECT_PARAMETERS = {
     'cache_control': 'public, max-age=86400',
 }
+
+
+# ---------------------------------------------------------------------------
+# Firebase Admin SDK Initialization
+# ---------------------------------------------------------------------------
+if GS_CREDENTIALS and os.path.exists(GS_CREDENTIALS):
+    import firebase_admin
+    from firebase_admin import credentials
+    
+    # Check if app is already initialized to avoid "app already exists" error
+    if not firebase_admin._apps:
+        cred = credentials.Certificate(GS_CREDENTIALS)
+        firebase_admin.initialize_app(cred)

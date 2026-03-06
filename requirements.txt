@@ -8,6 +8,7 @@ django-cors-headers==4.9.0
 django-microsoft-auth==3.0.1
 django-storages[google]==1.14.4
 djangorestframework==3.16.1
+firebase-admin==6.6.0
 google-cloud-storage==2.19.0
 idna==3.11
 oauthlib==3.3.1

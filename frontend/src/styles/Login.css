@@ -43,13 +43,13 @@
 }
 
 .info-blurb {
-  /* CHANGED: Slightly lighter dark grey to differentiate from card */
-  background-color: #2d2d2d;
+  /* Background Gray - dark */
+  background-color: #202020;
   padding: 1.5rem;
   border-radius: 8px;
   font-size: 0.95rem;
-  /* CHANGED: Light grey text for readability */
-  color: #d0d0d0;
+  /* UWM White */
+  color: #ffffff;
   margin-bottom: 2rem;
   line-height: 1.6;
 }
@@ -57,7 +57,7 @@
 /* BUTTON REMAINS UWM GOLD */
 .login-btn {
   background-color: #FFBD00; /* UWM Gold */
-  color: #000000; /* Black text still looks best on gold */
+  color: #000000;
   font-weight: bold;
   border: none;
   padding: 14px 28px;
@@ -69,8 +69,8 @@
 }
 
 .login-btn:hover {
-  background-color: #dda400; /* Slightly darker gold on hover */
-  transform: translateY(-2px); /* Slight lift effect */
-  /* ADJUSTED: Gold glow effect on hover */
+  /* CHANGED: Official UWM Gold - light for the hover state */
+  background-color: #ffd14c; 
+  transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(255, 189, 0, 0.4);
 }
