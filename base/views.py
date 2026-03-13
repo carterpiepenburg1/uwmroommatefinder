@@ -185,3 +185,144 @@ def get_programs(request):
     program_list = [{"id": code, "name": label} for code, label in Program.choices]
     
     return JsonResponse({"programs": program_list})
+
+@csrf_exempt
+def get_potential_matches(request):
+    """
+    Naive matching: Returns all groups the current user is NOT in,
+    and hasn't already liked. Group members are serialized.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Not authenticated"}, status=401)
+        
+    my_profile = request.user.profile
+    my_group = my_profile.group
+    
+    if not my_group:
+        from .models import Group
+        my_group = Group.objects.create(name=f"{request.user.username}'s Group")
+        my_profile.group = my_group
+        my_profile.save()
+
+    # Get IDs of groups we've already liked
+    from .models import GroupLike, Group
+    liked_group_ids = GroupLike.objects.filter(liker=my_group).values_list('liked_id', flat=True)
+    
+    # Get all other groups we haven't liked yet
+    potential_groups = Group.objects.exclude(id=my_group.id).exclude(id__in=liked_group_ids)
+    
+    matches_data = []
+    for group in potential_groups:
+        members_data = []
+        for member_profile in group.members.all():
+            m_user = member_profile.user
+            members_data.append({
+                "id": m_user.pk,
+                "name": f"{m_user.first_name} {m_user.last_name}".strip() or m_user.username,
+                "gender": member_profile.get_gender_display(),
+                "standing": member_profile.get_standing_display(),
+                "programs": [dict(Program.choices).get(p, p) for p in member_profile.programs]
+            })
+            
+        matches_data.append({
+            "group_id": group.id,
+            "group_name": group.name,
+            "members": members_data
+        })
+        
+    return JsonResponse({"matches": matches_data})
+
+@csrf_exempt
+def like_group(request):
+    """
+    Records that the current user's group 'likes' the target group.
+    If the target group has already liked us, it's a match!
+    Triggers Firebase chat creation.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Not authenticated"}, status=401)
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+        
+    try:
+        body = json.loads(request.body)
+        target_group_id = body.get("group_id")
+    except (json.JSONDecodeError, AttributeError):
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+        
+    if not target_group_id:
+        return JsonResponse({"error": "group_id required"}, status=400)
+
+    from .models import GroupLike, Group
+    my_profile = request.user.profile
+    my_group = my_profile.group
+    
+    if not my_group:
+        my_group = Group.objects.create(name=f"{request.user.username}'s Group")
+        my_profile.group = my_group
+        my_profile.save()
+    
+    try:
+        target_group = Group.objects.get(id=target_group_id)
+    except Group.DoesNotExist:
+        return JsonResponse({"error": "Target group not found"}, status=404)
+        
+    # Prevent self-like
+    if my_group.id == target_group.id:
+        return JsonResponse({"error": "Cannot like your own group"}, status=400)
+
+    # Record the like (ignore if already exists)
+    GroupLike.objects.get_or_create(liker=my_group, liked=target_group)
+    
+    # Check for mutual like
+    is_match = GroupLike.objects.filter(liker=target_group, liked=my_group).exists()
+    
+    conversation_id = None
+    if is_match:
+        # It's a match! Create Firebase conversation with all members of both groups
+        my_member_uids = [str(p.user.pk) for p in my_group.members.all()]
+        target_member_uids = [str(p.user.pk) for p in target_group.members.all()]
+        all_uids = sorted(list(set(my_member_uids + target_member_uids)))
+        
+        is_direct = len(all_uids) == 2
+        convo_type = "direct" if is_direct else "group"
+        convo_id = "_".join(all_uids) if is_direct else None
+        
+        user_objs = User.objects.filter(pk__in=[int(u) for u in all_uids])
+        participant_names = {
+            str(u.pk): f"{u.first_name} {u.last_name}".strip() or u.username
+            for u in user_objs
+        }
+
+        db = firestore.client()
+        convos_ref = db.collection("conversations")
+
+        if convo_id:
+            doc_ref = convos_ref.document(convo_id)
+            doc = doc_ref.get()
+            if not doc.exists:
+                doc_ref.set({
+                    "participants": all_uids,
+                    "participantNames": participant_names,
+                    "type": convo_type,
+                    "createdAt": firestore.SERVER_TIMESTAMP,
+                    "lastMessage": None,
+                })
+        else:
+            doc_ref = convos_ref.add({
+                "participants": all_uids,
+                "participantNames": participant_names,
+                "type": convo_type,
+                "createdAt": firestore.SERVER_TIMESTAMP,
+                "lastMessage": None,
+                "name": f"Match: {my_group.name} & {target_group.name}"
+            })[1]
+            convo_id = doc_ref.id
+            
+        conversation_id = convo_id
+
+    return JsonResponse({
+        "success": True, 
+        "is_match": is_match, 
+        "conversation_id": conversation_id
+    })
