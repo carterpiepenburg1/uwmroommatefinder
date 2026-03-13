@@ -1,5 +1,13 @@
 /* App.css */
 
+:root {
+  --uwm-gold: #FFBD00;
+  --uwm-black: #000000;
+  --uwm-dark: #121212;
+  --uwm-blue: #27729B;
+}
+
+
 /* 1. UNIVERSAL FONT (Helvetica for absolutely everything) */
 * {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
