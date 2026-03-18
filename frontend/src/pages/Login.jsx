@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import '../App';
 import '../styles/Login.css';
+import Header from '../components/Header'
 
 function App() {
 
@@ -16,6 +17,9 @@ function App() {
   };
 
   return (
+      <>
+          <Header />
+
     <div className="app-container">
       <div className="login-card">
         <h1>UWM Roommate Finder</h1>
@@ -37,6 +41,7 @@ function App() {
         </button>
       </div>
     </div>
+    </>
   );
 }
 
