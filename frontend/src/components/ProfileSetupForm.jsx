@@ -61,7 +61,7 @@ const ProfileSetupForm = ({ user, onComplete }) => {
     
     try {
       // Send the formData state to our new Django URL
-      const response = await fetch('http://localhost:8000/api/update_profile/', {
+      const response = await fetch('http://localhost:8000/api/profile/update/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ const ProfileSetupForm = ({ user, onComplete }) => {
   };
 
   return (
-    <div className="app-container">
+    <div className="profile-form-wrapper">
       <div className="form-card" style={{ maxWidth: '600px' }}>
         <h2>Complete Your Profile</h2>
         <p className="info-blurb">

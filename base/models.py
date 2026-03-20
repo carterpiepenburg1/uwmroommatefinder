@@ -298,6 +298,41 @@ class RoomType(models.TextChoices):
     double = 'D', 'Double'
     triple = 'T', 'Triple'
 
+class NoiseLevel(models.IntegerChoices):
+    QUIET    = 0, 'Quiet'
+    MODERATE = 1, 'Moderate'
+    LIVELY   = 2, 'Lively'
+
+class Cleanliness(models.IntegerChoices):
+    VERY_CLEAN = 0, 'Very Clean'
+    MODERATE   = 1, 'Moderate'
+    RELAXED    = 2, 'Relaxed'
+
+class SleepHabits(models.IntegerChoices):
+    EARLY_BIRD = 0, 'Early Bird'
+    MODERATE   = 1, 'Moderate'
+    NIGHT_OWL  = 2, 'Night Owl'
+
+class SocialLevel(models.IntegerChoices):
+    INTROVERT = 0, 'Introvert'
+    AMBIVERT  = 1, 'Ambivert'
+    EXTROVERT = 2, 'Extrovert'
+
+class GuestPolicy(models.IntegerChoices):
+    BARELY       = 0, 'Barely'
+    OCCASIONALLY = 1, 'Occasionally'
+    FREQUENTLY   = 2, 'Frequently'
+
+class AlcoholPolicy(models.IntegerChoices):
+    STRICTLY_DRY = 0, 'Strictly Dry'
+    OCCASIONALLY = 1, 'Occasionally'
+    COMFORTABLE  = 2, 'Comfortable'
+
+class SharedBelongings(models.IntegerChoices):
+    KEEP_SEPARATE    = 0, 'Keep Separate'
+    ASK_FIRST        = 1, 'Ask First'
+    SHARE_EVERYTHING = 2, 'Share Everything'
+
 class Group(models.Model):
     
     #ADD GROUP SPECIFIC FIELDS HERE
@@ -332,7 +367,22 @@ class Profile(models.Model):
     # Preferences (blank by default)
     dorm_building = models.CharField(max_length=2, choices=DormBuilding.choices, null=True, blank=True)
     room_type = models.CharField(max_length=2, choices=RoomType.choices, null=True, blank=True)
-    preferences = models.JSONField(default=dict, blank=True)
+
+    noise_level       = models.IntegerField(choices=NoiseLevel.choices, null=True, blank=True)
+    cleanliness       = models.IntegerField(choices=Cleanliness.choices, null=True, blank=True)
+    sleep_habits      = models.IntegerField(choices=SleepHabits.choices, null=True, blank=True)
+    social_level      = models.IntegerField(choices=SocialLevel.choices, null=True, blank=True)
+    guest_policy      = models.IntegerField(choices=GuestPolicy.choices, null=True, blank=True)
+    alcohol_policy    = models.IntegerField(choices=AlcoholPolicy.choices, null=True, blank=True)
+    shared_belongings = models.IntegerField(choices=SharedBelongings.choices, null=True, blank=True)
+
+    noise_level_priority       = models.BooleanField(default=False)
+    cleanliness_priority       = models.BooleanField(default=False)
+    sleep_habits_priority      = models.BooleanField(default=False)
+    social_level_priority      = models.BooleanField(default=False)
+    guest_policy_priority      = models.BooleanField(default=False)
+    alcohol_policy_priority    = models.BooleanField(default=False)
+    shared_belongings_priority = models.BooleanField(default=False)
 
     # Group
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, related_name='members', null=True, blank=True)
