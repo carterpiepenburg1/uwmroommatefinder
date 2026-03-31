@@ -33,6 +33,9 @@ function Sidebar() {
             <Link to="/chat">Chat</Link>
           </li>
           <li>
+            <Link to="/notifications">Notifications</Link>
+          </li>
+          <li>
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
