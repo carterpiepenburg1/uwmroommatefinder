@@ -384,6 +384,9 @@ class Profile(models.Model):
     alcohol_policy_priority    = models.BooleanField(default=False)
     shared_belongings_priority = models.BooleanField(default=False)
 
+    # Visibility
+    is_active = models.BooleanField(default=True)
+
     # Group
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, related_name='members', null=True, blank=True)
 
