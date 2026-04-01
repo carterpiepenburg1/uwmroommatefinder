@@ -10,7 +10,7 @@ from firebase_admin import firestore
 import datetime
 
 import json
-from .models import Profile, Program
+from .models import Profile, Program, NoiseLevel, Cleanliness, SleepHabits, SocialLevel, GuestPolicy, AlcoholPolicy, SharedBelongings
 
 @csrf_exempt
 def logout_view(request):
@@ -46,6 +46,10 @@ def current_user(request):
             'last_name': request.user.last_name,
             
             'is_profile_complete': profile.is_profile_complete,
+            'is_preferences_complete': all(
+                getattr(profile, f) is not None
+                for f in ['noise_level', 'cleanliness', 'sleep_habits', 'social_level', 'guest_policy', 'alcohol_policy', 'shared_belongings']
+            ),
             
             # --- RAW KEYS (For the forms to use as default values) ---
             'gender': profile.gender, 
@@ -54,16 +58,41 @@ def current_user(request):
             'dorm_building': profile.dorm_building,
             'room_type': profile.room_type,
             'programs': profile.programs,
-            'preferences': profile.preferences,
 
             # --- DISPLAY NAMES (For the dashboard UI to print) ---
-            'gender_display': profile.get_gender_display(), 
+            'gender_display': profile.get_gender_display(),
             'standing_display': profile.get_standing_display(),
             'term_display': profile.get_term_display(),
             'dorm_building_display': profile.get_dorm_building_display(),
             'room_type_display': profile.get_room_type_display(),
-            
+
             'programs_display': programs_display,
+
+            # --- PREFERENCE RAW VALUES (for the form) ---
+            'noise_level': profile.noise_level,
+            'cleanliness': profile.cleanliness,
+            'sleep_habits': profile.sleep_habits,
+            'social_level': profile.social_level,
+            'guest_policy': profile.guest_policy,
+            'alcohol_policy': profile.alcohol_policy,
+            'shared_belongings': profile.shared_belongings,
+
+            'noise_level_priority': profile.noise_level_priority,
+            'cleanliness_priority': profile.cleanliness_priority,
+            'sleep_habits_priority': profile.sleep_habits_priority,
+            'social_level_priority': profile.social_level_priority,
+            'guest_policy_priority': profile.guest_policy_priority,
+            'alcohol_policy_priority': profile.alcohol_policy_priority,
+            'shared_belongings_priority': profile.shared_belongings_priority,
+
+            # --- PREFERENCE DISPLAY NAMES (for the profile card) ---
+            'noise_level_display': profile.get_noise_level_display(),
+            'cleanliness_display': profile.get_cleanliness_display(),
+            'sleep_habits_display': profile.get_sleep_habits_display(),
+            'social_level_display': profile.get_social_level_display(),
+            'guest_policy_display': profile.get_guest_policy_display(),
+            'alcohol_policy_display': profile.get_alcohol_policy_display(),
+            'shared_belongings_display': profile.get_shared_belongings_display(),
         })
     return JsonResponse({"error": "Not authenticated"}, status=401)
 
@@ -176,6 +205,43 @@ def update_profile(request):
         return JsonResponse({"message": "Profile fully updated!"})
         
     return JsonResponse({"error": "Unauthorized or bad request"}, status=400)
+
+@csrf_exempt
+def update_preferences(request):
+    if request.method != 'POST' or not request.user.is_authenticated:
+        return JsonResponse({"error": "Unauthorized or bad request"}, status=400)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    profile = request.user.profile
+
+    def parse_int(val):
+        if val is None or val == '':
+            return None
+        return int(val)
+
+    profile.noise_level       = parse_int(data.get('noise_level'))
+    profile.cleanliness       = parse_int(data.get('cleanliness'))
+    profile.sleep_habits      = parse_int(data.get('sleep_habits'))
+    profile.social_level      = parse_int(data.get('social_level'))
+    profile.guest_policy      = parse_int(data.get('guest_policy'))
+    profile.alcohol_policy    = parse_int(data.get('alcohol_policy'))
+    profile.shared_belongings = parse_int(data.get('shared_belongings'))
+
+    profile.noise_level_priority       = bool(data.get('noise_level_priority', False))
+    profile.cleanliness_priority       = bool(data.get('cleanliness_priority', False))
+    profile.sleep_habits_priority      = bool(data.get('sleep_habits_priority', False))
+    profile.social_level_priority      = bool(data.get('social_level_priority', False))
+    profile.guest_policy_priority      = bool(data.get('guest_policy_priority', False))
+    profile.alcohol_policy_priority    = bool(data.get('alcohol_policy_priority', False))
+    profile.shared_belongings_priority = bool(data.get('shared_belongings_priority', False))
+
+    profile.save()
+    return JsonResponse({"message": "Preferences updated!"})
+
 
 def get_programs(request):
     # Program.choices automatically returns a list of tuples like:
