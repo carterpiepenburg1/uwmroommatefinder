@@ -387,6 +387,9 @@ class Profile(models.Model):
     # Group
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, related_name='members', null=True, blank=True)
 
+    #Roommate Requests (works both ways because of related name "outgoing_requests")
+    incoming_requests = models.ManyToManyField('self', symmetrical=False, related_name='outgoing_requests', blank=True)
+
     def __str__(self):
         return self.user.username
 
