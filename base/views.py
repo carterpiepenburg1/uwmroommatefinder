@@ -46,6 +46,7 @@ def current_user(request):
             'last_name': request.user.last_name,
             
             'is_profile_complete': profile.is_profile_complete,
+            'is_active': profile.is_active,
             'is_preferences_complete': all(
                 getattr(profile, f) is not None
                 for f in ['noise_level', 'cleanliness', 'sleep_habits', 'social_level', 'guest_policy', 'alcohol_policy', 'shared_belongings']
@@ -243,6 +244,21 @@ def update_preferences(request):
     return JsonResponse({"message": "Preferences updated!"})
 
 
+@csrf_exempt
+def toggle_active(request):
+    if request.method != 'POST' or not request.user.is_authenticated:
+        return JsonResponse({"error": "Unauthorized or bad request"}, status=400)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    profile = request.user.profile
+    profile.is_active = bool(data.get('is_active', True))
+    profile.save()
+    return JsonResponse({"is_active": profile.is_active})
+
+
 def get_programs(request):
     # Program.choices automatically returns a list of tuples like:
     # [('CS', 'Computer Science'), ('ART', 'Art'), ...]
@@ -252,50 +268,81 @@ def get_programs(request):
     
     return JsonResponse({"programs": program_list})
 
+PREF_FIELDS = [
+    'noise_level', 'cleanliness', 'sleep_habits',
+    'social_level', 'guest_policy', 'alcohol_policy', 'shared_belongings',
+]
+
+def compute_compatibility(my_profile, their_profile):
+    """
+    Returns a 0–100 compatibility score (higher = better match).
+    Uses the current user's priority flags to weight each field.
+    Missing values default to 1 (the middle option).
+    """
+    raw = 0
+    max_possible = 0
+    for field in PREF_FIELDS:
+        my_val    = getattr(my_profile, field)
+        their_val = getattr(their_profile, field)
+        my_val    = my_val    if my_val    is not None else 1
+        their_val = their_val if their_val is not None else 1
+        weight = 5 if getattr(my_profile, f'{field}_priority') else 1
+        raw          += weight * abs(my_val - their_val)
+        max_possible += weight * 2  # max possible difference per field is 2
+    return round((1 - raw / max_possible) * 100)
+
+
 @csrf_exempt
 def get_potential_matches(request):
     """
-    Naive matching: Returns all groups the current user is NOT in,
-    and hasn't already liked. Group members are serialized.
+    Returns all groups the current user is NOT in and hasn't already liked,
+    with each member scored by compatibility. Results sorted best match first.
     """
     if not request.user.is_authenticated:
         return JsonResponse({"error": "Not authenticated"}, status=401)
-        
+
     my_profile = request.user.profile
     my_group = my_profile.group
-    
+
     if not my_group:
         from .models import Group
         my_group = Group.objects.create(name=f"{request.user.username}'s Group")
         my_profile.group = my_group
         my_profile.save()
 
-    # Get IDs of groups we've already liked
     from .models import GroupLike, Group
     liked_group_ids = GroupLike.objects.filter(liker=my_group).values_list('liked_id', flat=True)
-    
-    # Get all other groups we haven't liked yet
+
     potential_groups = Group.objects.exclude(id=my_group.id).exclude(id__in=liked_group_ids)
-    
+
     matches_data = []
     for group in potential_groups:
         members_data = []
-        for member_profile in group.members.all():
+        for member_profile in group.members.filter(is_active=True):
             m_user = member_profile.user
+            score = compute_compatibility(my_profile, member_profile)
             members_data.append({
                 "id": m_user.pk,
                 "name": f"{m_user.first_name} {m_user.last_name}".strip() or m_user.username,
                 "gender": member_profile.get_gender_display(),
                 "standing": member_profile.get_standing_display(),
-                "programs": [dict(Program.choices).get(p, p) for p in member_profile.programs]
+                "programs": [dict(Program.choices).get(p, p) for p in member_profile.programs],
+                "compatibility_score": score,
             })
-            
-        matches_data.append({
-            "group_id": group.id,
-            "group_name": group.name,
-            "members": members_data
-        })
-        
+
+        if members_data:
+            # Sort members within each group best-first, use top member score for group ordering
+            members_data.sort(key=lambda m: m["compatibility_score"], reverse=True)
+            matches_data.append({
+                "group_id": group.id,
+                "group_name": group.name,
+                "members": members_data,
+                "top_score": members_data[0]["compatibility_score"],
+            })
+
+    # Sort groups best-first by their top member's score
+    matches_data.sort(key=lambda g: g["top_score"], reverse=True)
+
     return JsonResponse({"matches": matches_data})
 
 @csrf_exempt
