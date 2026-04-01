@@ -1,6 +1,7 @@
 // Dashboard.jsx
 import React, { useState, useEffect } from 'react';
 import ProfileSetupForm from '../components/ProfileSetupForm';
+import PreferencesForm from '../components/PreferencesForm';
 
 const Dashboard = () => {
   // Add a loading state to prevent flashing the wrong screen
@@ -29,14 +30,22 @@ const Dashboard = () => {
     return <div style={{ color: "white", padding: "20px" }}>Loading your dashboard...</div>;
   }
 
-  // STATE 2: THE BOUNCER
-  // If Django explicitly says the profile isn't done, force them to the form
+  // STATE 2: Profile info not complete
   if (user && user.is_profile_complete === false) {
     return (
-      <ProfileSetupForm 
-        user={user} 
-        // When the form finishes saving, refresh the page to pull the new "true" flag
-        onComplete={() => window.location.reload()} 
+      <ProfileSetupForm
+        user={user}
+        onComplete={() => window.location.reload()}
+      />
+    );
+  }
+
+  // STATE 2.5: Preferences not complete
+  if (user && user.is_preferences_complete === false) {
+    return (
+      <PreferencesForm
+        user={user}
+        onComplete={() => window.location.reload()}
       />
     );
   }

@@ -1,47 +1,34 @@
-/* Login.css */
+/* ProfileSetupForm.css */
 
-#root {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-}
-
-.app-container {
+.profile-form-wrapper {
   display: flex;
   justify-content: center;
-  background-color: #333333;
+  background-color: transparent;
+  padding: 20px 0;
 }
 
 .form-card {
-  /* Black - light */
   background: #333333;
   padding: 3rem;
   border-radius: 12px;
-  /* Drop Shadow */
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  /* Black - lighter */
   border: 1px solid #999999;
-  max-width: 450px;
   width: 90%;
   text-align: center;
 }
 
 .info-blurb {
-  /* Background Gray - dark */
   background-color: #202020;
   padding: 1.5rem;
   border-radius: 8px;
   font-size: 0.95rem;
-  /* UWM White */
   color: #ffffff;
   margin-bottom: 2rem;
   line-height: 1.6;
 }
 
-/* BUTTON REMAINS UWM GOLD */
 .form-btn {
-  background-color: #FFBD00; /* UWM Gold */
+  background-color: #FFBD00;
   color: #000000;
   font-weight: bold;
   border: none;
@@ -54,8 +41,7 @@
 }
 
 .form-btn:hover {
-  /* CHANGED: Official UWM Gold - light for the hover state */
-  background-color: #ffd14c; 
+  background-color: #ffd14c;
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(255, 189, 0, 0.4);
 }
