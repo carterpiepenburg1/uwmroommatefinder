@@ -1,0 +1,106 @@
+/* FieldHint.css */
+
+/* ── wrapper sits inline next to the label text ── */
+.field-hint {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  vertical-align: middle;
+  cursor: default;
+}
+
+/* ── the ⓘ icon ── */
+.field-hint__icon {
+  font-size: 0.85rem;
+  color: #FFBD00;           /* matches the app's gold accent */
+  opacity: 0.75;
+  line-height: 1;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  user-select: none;
+}
+
+.field-hint:hover .field-hint__icon {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+/* ── tooltip bubble ── */
+.field-hint__tooltip {
+  position: absolute;
+  z-index: 100;
+
+  /* semi-transparent frosted look */
+  background: rgba(20, 20, 20, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.78rem;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 189, 0, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+
+  width: max-content;
+  max-width: 240px;
+  white-space: normal;
+  pointer-events: none;
+
+  /* hidden by default */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+/* ── position variants ── */
+
+/* TOP (default) */
+.field-hint--top .field-hint__tooltip {
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+}
+.field-hint--top:hover .field-hint__tooltip {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* BOTTOM */
+.field-hint--bottom .field-hint__tooltip {
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+}
+.field-hint--bottom:hover .field-hint__tooltip {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* RIGHT */
+.field-hint--right .field-hint__tooltip {
+  top: 50%;
+  left: calc(100% + 8px);
+  transform: translateY(-50%) translateX(-4px);
+}
+.field-hint--right:hover .field-hint__tooltip {
+  transform: translateY(-50%) translateX(0);
+}
+
+/* LEFT */
+.field-hint--left .field-hint__tooltip {
+  top: 50%;
+  right: calc(100% + 8px);
+  transform: translateY(-50%) translateX(4px);
+}
+.field-hint--left:hover .field-hint__tooltip {
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ── reveal on hover ── */
+.field-hint:hover .field-hint__tooltip {
+  opacity: 1;
+  visibility: visible;
+}

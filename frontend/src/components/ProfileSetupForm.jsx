@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import '../styles/ProfileSetupForm.css';
+import FieldHint from './FieldHint';
 
 const ProfileSetupForm = ({ user, onComplete }) => {
   // 1. Set up the state to hold the form answers. 
@@ -93,7 +94,10 @@ const ProfileSetupForm = ({ user, onComplete }) => {
           
           {/* GENDER */}
           <div>
-            <label>Gender Identity</label>
+            <label>
+              Gender Identity
+              <FieldHint text="This helps us suggest compatible roommates. Choose 'Other / Inclusive Housing' if you're open to any living arrangement." />
+            </label>
             <select name="gender" value={formData.gender} onChange={handleChange} required style={dropdownStyle}>
               <option value="" disabled>Select...</option>
               <option value="M">Male</option>
@@ -104,7 +108,10 @@ const ProfileSetupForm = ({ user, onComplete }) => {
 
           {/* STANDING */}
           <div>
-            <label>Class Standing</label>
+            <label>
+              Class Standing
+              <FieldHint text="Your academic year at UWM. This is used to find roommates at a similar stage in their college journey." position="right" />
+            </label>
             <select name="standing" value={formData.standing} onChange={handleChange} required style={dropdownStyle}>
               <option value="" disabled>Select...</option>
               <option value="FR">Freshman</option>
@@ -114,9 +121,12 @@ const ProfileSetupForm = ({ user, onComplete }) => {
             </select>
           </div>
 
-          {/* 5. NEW: The dynamic programs dropdown */}
+          {/* Primary Major */}
           <div>
-            <label>Primary Major / Program</label>
+            <label>
+              Primary Major / Program
+              <FieldHint text="Select your declared (or intended) major. Students in the same or related fields often have similar schedules, which improves match quality." />
+            </label>
             <select 
               name="programs" 
               value={formData.programs[0] || ''} 
@@ -158,7 +168,10 @@ const ProfileSetupForm = ({ user, onComplete }) => {
 
           {/* TERM */}
           <div>
-            <label>Term</label>
+            <label>
+              Term
+              <FieldHint text="The semester you'll be moving in. Only users on the same term will be shown as potential matches." position="right" />
+            </label>
             <select name="term" value={formData.term} onChange={handleChange} required style={dropdownStyle}>
               <option value="" disabled>Select...</option>
               <option value="F">Fall</option>
