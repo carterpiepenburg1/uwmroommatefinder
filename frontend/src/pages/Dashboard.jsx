@@ -2,8 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import ProfileSetupForm from '../components/ProfileSetupForm';
 import PreferencesForm from '../components/PreferencesForm';
+<<<<<<< WillBranch
+import tutorial_1 from "../assets/tutorial_1.png";
+import tutorial_2 from "../assets/tutorial_2.png";
+import tutorial_3 from "../assets/tutorial_3.png";
+=======
 import { Link } from 'react-router-dom';
 import '../styles/Dashboard.css';
+>>>>>>> main
 
 const Dashboard = () => {
   // Add a loading state to prevent flashing the wrong screen
@@ -54,14 +60,41 @@ const Dashboard = () => {
 
   // STATE 3: THE ACTUAL APP
   return (
+<<<<<<< WillBranch
+      <div style={{ color: "white", padding: "20px", width: "50%", margin: "0 auto" }}>
+=======
       <div className="dashboard-container">
+>>>>>>> main
         
         <h1>Dashboard</h1>
         {/* Logic: If we have a first name, show "Welcome, Max!". 
           Otherwise, show "Welcome, maxkrug@uwm.edu!" 
         */}
-        <p>
+        <h2>
           Welcome, {user.first_name ? user.first_name : user.email}!
+<<<<<<< WillBranch
+        </h2>
+        <p>This is your dashboard. If this is your first time here, check below for a tutorial on how to get started. Otherwise, feel free to explore the app and check your matches!</p>
+        <div style={{ color: "white", padding: "20px"}}>
+          <h2>Getting Started</h2>
+          <h3>1. Finalize Your Profile</h3>
+            <p>
+              You should have already filled out your profile information and preferences, but sometimes you might want to update them! 
+              Just click on the "Profile" tab in the navigation bar to edit your information and preferences. This helps us find better matches for you.
+              <br></br>
+              <br></br>
+              To edit, scroll down to Profile Info or click on Preferences:   
+            </p>
+            <img style={{ marginBottom: '50px' }} src={tutorial_1} alt="Update Info" />
+            <p>Update the desired field(s):</p>
+            <img style={{ marginBottom: '50px' }} src={tutorial_2} alt="Menu Selection" />
+            <p>Then click Save:</p>
+            <img style={{ marginBottom: '50px' }} src={tutorial_3} alt="Save Changes" />
+          <h3>2. Find Your Perfect Roommate</h3>
+          <h3>3. Start Chatting!</h3>
+          <h3>4. Check Notifications</h3>
+        </div>
+=======
         </p>
 
           {/* Navigation grid for different parts of the app */}
@@ -91,6 +124,7 @@ const Dashboard = () => {
                   <p>Notifications for matches, chats, and more</p>
               </Link>
           </div>
+>>>>>>> main
       </div>
   );
 };
