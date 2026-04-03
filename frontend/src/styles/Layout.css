@@ -34,3 +34,7 @@
   font-size: 14px;
   color: #6b7280;
 }
+
+p {
+  line-height: 2;
+}
