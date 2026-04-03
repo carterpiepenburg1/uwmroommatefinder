@@ -1,0 +1,89 @@
+.match-card-container {
+  display: flex;
+  justify-content: center;
+}
+
+.match-card {
+  width: 100%;
+  max-width: 650px;
+  background-color: #ffffff;
+  color: #222;
+  padding: 40px;
+  border-radius: 18px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+.match-card * {
+  color: #222;
+}
+
+.match-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.match-card-name {
+  font-size: 1.9rem;
+  margin: 0;
+  text-align: left;
+}
+
+.match-score-badge {
+  background-color: #FFBD00;
+  color: #000;
+  font-weight: bold;
+  font-size: 0.9rem;
+  padding: 4px 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.match-card-section {
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+.match-pref-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+.match-pref-item {
+  background-color: #eef2f7;
+  display: inline-block;
+  padding: 6px 12px;
+  margin: 6px 6px 0 0;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.match-card-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.match-btn {
+  flex: 1;
+  max-width: 160px;
+  padding: 10px 0;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+.match-btn-accept {
+  background-color: #2ecc71;
+}
+
+.match-btn-deny {
+  background-color: #e74c3c;
+}

@@ -10,3 +10,6 @@ db.sqlite3
 # Python virtual environment
 .venv/
 venv/
+
+# Node modules
+node_modules/
