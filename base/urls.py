@@ -13,5 +13,4 @@ urlpatterns = [
     path('api/profile/active/', views.toggle_active, name='toggle_active'),
     path('api/programs/', views.get_programs, name='get_programs'),
     path('api/matches/potential/', views.get_potential_matches, name='get_potential_matches'),
-    path('api/matches/like/', views.like_group, name='like_group'),
 ]
