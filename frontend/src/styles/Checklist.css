@@ -1,0 +1,52 @@
+.checklist-page {
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.checklist-title {
+  color: var(--uwm-gold);
+  margin-bottom: 0.5rem;
+}
+
+.checklist-subtitle {
+  color: #aaa;
+  margin-bottom: 2rem;
+}
+
+.checklist-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.checklist-input input {
+  flex: 1;
+  padding: 8px;
+}
+
+.checklist-list {
+  list-style: none;
+  padding: 0;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.checklist-item button {
+  margin-left: auto;
+}
+
+.checked {
+  text-decoration: line-through;
+  color: gray;
+}
+
+.save-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+}

@@ -2,9 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import ProfileSetupForm from '../components/ProfileSetupForm';
 import PreferencesForm from '../components/PreferencesForm';
+<<<<<<< WillBranch
 import tutorial_1 from "../assets/tutorial_1.png";
 import tutorial_2 from "../assets/tutorial_2.png";
 import tutorial_3 from "../assets/tutorial_3.png";
+=======
+import { Link } from 'react-router-dom';
+import '../styles/Dashboard.css';
+>>>>>>> main
 
 const Dashboard = () => {
   // Add a loading state to prevent flashing the wrong screen
@@ -55,15 +60,19 @@ const Dashboard = () => {
 
   // STATE 3: THE ACTUAL APP
   return (
+<<<<<<< WillBranch
       <div style={{ color: "white", padding: "20px", width: "50%", margin: "0 auto" }}>
+=======
+      <div className="dashboard-container">
+>>>>>>> main
         
         <h1>Dashboard</h1>
-        
         {/* Logic: If we have a first name, show "Welcome, Max!". 
           Otherwise, show "Welcome, maxkrug@uwm.edu!" 
         */}
         <h2>
           Welcome, {user.first_name ? user.first_name : user.email}!
+<<<<<<< WillBranch
         </h2>
         <p>This is your dashboard. If this is your first time here, check below for a tutorial on how to get started. Otherwise, feel free to explore the app and check your matches!</p>
         <div style={{ color: "white", padding: "20px"}}>
@@ -85,6 +94,37 @@ const Dashboard = () => {
           <h3>3. Start Chatting!</h3>
           <h3>4. Check Notifications</h3>
         </div>
+=======
+        </p>
+
+          {/* Navigation grid for different parts of the app */}
+          <div className="dashboard-grid">
+              <Link to="/Profile" className="dashboard-card">
+                  <h3> Profile</h3>
+                  <p>Edit profile details and adjust preferences</p>
+              </Link>
+
+              <Link to="/Checklist" className="dashboard-card">
+                  <h3>Checklist</h3>
+                  <p>Adjust your checklist for when you move in</p>
+              </Link>
+
+              <Link to="/Matches" className="dashboard-card">
+                  <h3>Explore and Connect</h3>
+                  <p>Connect and reach out to other students</p>
+              </Link>
+
+              <Link to="/Chat" className="dashboard-card">
+                  <h3>Chat</h3>
+                  <p>Checkout your chats with other students</p>
+              </Link>
+
+              <Link to="/Notifications" className="dashboard-card">
+                  <h3>Notifications</h3>
+                  <p>Notifications for matches, chats, and more</p>
+              </Link>
+          </div>
+>>>>>>> main
       </div>
   );
 };
