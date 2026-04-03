@@ -1,9 +1,13 @@
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import '../styles/Layout.css';
+import {useState} from "react";
 
 function Layout() {
   const location = useLocation();
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const getPageTitle = () => {
     switch (location.pathname) {
@@ -21,11 +25,17 @@ function Layout() {
   };
 
   return (
+      /* Sidebar logic */
     <div className="layout">
+        <div className={`sidebar-drawer ${sidebarOpen ? 'open' : ''}`}>
       <Sidebar />
+        </div>
 
-      <div className="content-wrapper">
+      <div className={`content-wrapper ${sidebarOpen ? 'shifted' : ''}`}>
         <header className="topbar">
+            <button className="menu-toggle" onClick={toggleSidebar}>
+                {sidebarOpen ? 'X' : '≡'}
+            </button>
           <h2>{getPageTitle()}</h2>
         </header>
 
@@ -37,7 +47,9 @@ function Layout() {
           © {new Date().getFullYear()} UWM Roommate Finder. All rights reserved.
         </footer>
       </div>
-    </div>
+
+          {sidebarOpen && <div className="overlay" onClick={toggleSidebar}></div>}
+      </div>
   );
 }
 
