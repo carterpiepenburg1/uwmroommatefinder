@@ -2,62 +2,38 @@ import { useState, useEffect } from "react";
 import NotificationCard from "../components/NotificationCard";
 import "../styles/Notifications.css";
 
-const MOCK_REQUESTS = [
-  {
-    id: 1,
-    sender: "Alex Johnson",
-    program: "Computer Science",
-    standing: "Sophomore",
-    roomType: "Double",
-    dorm: "Sandburg (N/S/W)",
-    sentAt: "2 hours ago",
-    status: "pending",
-  },
-  {
-    id: 2,
-    sender: "Maria Garcia",
-    program: "Nursing",
-    standing: "Freshman",
-    roomType: "Triple",
-    dorm: "Cambridge Commons",
-    sentAt: "5 hours ago",
-    status: "pending",
-  },
-  {
-    id: 3,
-    sender: "Jordan Lee",
-    program: "Business Analytics",
-    standing: "Junior",
-    roomType: "Double",
-    dorm: "Riverview",
-    sentAt: "Yesterday",
-    status: "pending",
-  },
-];
-
 function Notifications() {
-  const [requests, setRequests] = useState(MOCK_REQUESTS);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     document.title = "Notifications | Roommate Finder";
+    fetch("http://localhost:8000/api/notifications/", { credentials: "include" })
+      .then(res => res.json())
+      .then(data => setRequests((data.requests || []).map(r => ({ ...r, status: "pending" }))))
+      .finally(() => setLoading(false));
   }, []);
 
   const handleAccept = (id) => {
-    // TODO: POST to backend to accept match request
-    setRequests((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status: "accepted" } : r))
-    );
+    fetch(`http://localhost:8000/api/match/accept/${id}/`, {
+      method: "POST",
+      credentials: "include",
+    });
+    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: "accepted" } : r));
   };
 
   const handleDecline = (id) => {
-    // TODO: POST to backend to decline match request
-    setRequests((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status: "declined" } : r))
-    );
+    fetch(`http://localhost:8000/api/match/decline/${id}/`, {
+      method: "POST",
+      credentials: "include",
+    });
+    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: "declined" } : r));
   };
 
   const pending = requests.filter((r) => r.status === "pending");
   const resolved = requests.filter((r) => r.status !== "pending");
+
+  if (loading) return <div style={{ padding: "2rem", color: "white" }}>Loading...</div>;
 
   return (
     <div className="notifications-page">
@@ -77,7 +53,7 @@ function Notifications() {
             {pending.map((req) => (
               <NotificationCard
                 key={req.id}
-                request={req}
+                notification={req}
                 onAccept={handleAccept}
                 onDecline={handleDecline}
               />
@@ -93,7 +69,7 @@ function Notifications() {
             {resolved.map((req) => (
               <NotificationCard
                 key={req.id}
-                request={req}
+                notification={req}
                 onAccept={handleAccept}
                 onDecline={handleDecline}
               />

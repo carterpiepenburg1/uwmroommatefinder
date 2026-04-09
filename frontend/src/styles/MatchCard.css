@@ -87,3 +87,9 @@
 .match-btn-deny {
   background-color: #e74c3c;
 }
+
+.match-btn-pending {
+  background-color: #555;
+  color: #aaa;
+  cursor: default;
+}

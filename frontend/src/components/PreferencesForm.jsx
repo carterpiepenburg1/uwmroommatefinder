@@ -6,8 +6,8 @@ const PREFERENCE_FIELDS = [
   { key: 'noise_level', label: 'Noise Level', hint: 'How much noise is acceptable in your living space?', options: [[0, 'Quiet'], [1, 'Moderate'], [2, 'Lively']] },
   { key: 'cleanliness', label: 'Cleanliness', hint: 'How tidy do you expect your shared living space to be?', options: [[0, 'Very Clean'], [1, 'Moderate'], [2, 'Relaxed']] },
   { key: 'sleep_habits', label: 'Sleep Habits', hint: 'Are you an early bird, night owl, or somewhere in between?', options: [[0, 'Early Bird'], [1, 'Moderate'], [2, 'Night Owl']] },
-  { key: 'social_level', label: 'Social Level', hint: 'How social do you like to be with your roommate?', options: [[0, 'Introvert'], [1, 'Ambivert'], [2, 'Extrovert']] },
-  { key: 'guest_policy', label: 'Guest Policy', hint: 'How often do you expect to have guests over?', options: [[0, 'Barely'], [1, 'Occasionally'], [2, 'Frequently']] },
+  { key: 'social_level', label: 'Social Level', hint: 'How social do you tend to be?', options: [[0, 'Introvert'], [1, 'Ambivert'], [2, 'Extrovert']] },
+  { key: 'guest_policy', label: 'Guest Policy', hint: 'How often can your roommate bring guests over?', options: [[0, 'Barely'], [1, 'Occasionally'], [2, 'Frequently']] },
   { key: 'alcohol_policy', label: 'Alcohol Policy', hint: 'What is your stance on alcohol in the living space?', options: [[0, 'Strictly Dry'], [1, 'Occasionally'], [2, 'Comfortable']] },
   { key: 'shared_belongings', label: 'Shared Belongings', hint: 'How do you feel about sharing personal belongings with your roommate?', options: [[0, 'Keep Separate'], [1, 'Ask First'], [2, 'Share Everything']] },
 ];
