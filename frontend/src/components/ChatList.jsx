@@ -33,11 +33,12 @@ function ChatList({ selectedId, onSelect }) {
     return (
         <ul className="chat-list">
             {conversations.map((convo) => {
-                // For direct chats, show the OTHER person's name
+                // 1-on-1: show the other person's name. Group (3+): show "Group Chat"
+                const isGroup = (convo.participants?.length ?? 0) > 2;
                 const otherUid = convo.participants?.find((p) => p !== firebaseUid);
-                const displayName =
-                    convo.participantNames?.[otherUid] ??
-                    (convo.type === "group" ? convo.name ?? "Group Chat" : "Unknown");
+                const displayName = isGroup
+                    ? "Group Chat"
+                    : convo.participantNames?.[otherUid] ?? "Unknown";
 
                 const lastText = convo.lastMessage?.text ?? "No messages yet";
                 const isSelected = convo.id === selectedId;

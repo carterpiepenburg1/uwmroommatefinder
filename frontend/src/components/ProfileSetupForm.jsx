@@ -96,7 +96,7 @@ const ProfileSetupForm = ({ user, onComplete }) => {
           <div>
             <label>
               Gender Identity
-              <FieldHint text="This helps us suggest compatible roommates. Choose 'Other / Inclusive Housing' if you're open to any living arrangement." />
+              <FieldHint text="This helps us suggest compatible roommates." />
             </label>
             <select name="gender" value={formData.gender} onChange={handleChange} required style={dropdownStyle}>
               <option value="" disabled>Select...</option>
@@ -110,7 +110,7 @@ const ProfileSetupForm = ({ user, onComplete }) => {
           <div>
             <label>
               Class Standing
-              <FieldHint text="Your academic year at UWM. This is used to find roommates at a similar stage in their college journey." position="right" />
+              <FieldHint text="Your academic year at UWM." position="right" />
             </label>
             <select name="standing" value={formData.standing} onChange={handleChange} required style={dropdownStyle}>
               <option value="" disabled>Select...</option>
@@ -125,7 +125,7 @@ const ProfileSetupForm = ({ user, onComplete }) => {
           <div>
             <label>
               Primary Major / Program
-              <FieldHint text="Select your declared (or intended) major. Students in the same or related fields often have similar schedules, which improves match quality." />
+              <FieldHint text="Select your declared (or intended) major." />
             </label>
             <select 
               name="programs" 
@@ -145,7 +145,10 @@ const ProfileSetupForm = ({ user, onComplete }) => {
 
           {/* DORM BUILDING */}
           <div>
-            <label>Preferred Dorm</label>
+            <label>
+              Preferred Dorm
+              <FieldHint text="Select where you plan to live this coming semester." />
+            </label>
             <select name="dorm_building" value={formData.dorm_building} onChange={handleChange} required style={dropdownStyle}>
               <option value="" disabled>Select...</option>
               <option value="C">Cambridge Commons</option>
@@ -157,7 +160,10 @@ const ProfileSetupForm = ({ user, onComplete }) => {
 
           {/* ROOM TYPE */}
           <div>
-            <label>Room Type</label>
+            <label>
+              Room Type
+              <FieldHint text="Select your desired room time for this coming semester." />
+            </label>
             <select name="room_type" value={formData.room_type} onChange={handleChange} required style={dropdownStyle}>
               <option value="" disabled>Select...</option>
               <option value="S">Single</option>
