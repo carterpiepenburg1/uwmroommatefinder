@@ -1,0 +1,146 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  :root {
+    --bg-root:     #121212;
+    --bg-surface:  #1e1e1e;
+    --bg-raised:   #2a2a2a;
+    --border:      #3a3a3a;
+    --border-subtle: #2e2e2e;
+    --gold:        #FFBD00;
+    --gold-dim:    rgba(255,189,0,.1);
+    --text-primary:   #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-muted:     #6b6b6b;
+    --radius:      6px;
+    --radius-lg:   10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body, #content {
+    background: var(--bg-root) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+  }
+  #header {
+    background: #000 !important;
+    border-bottom: 2px solid var(--gold) !important;
+    padding: 10px 24px !important;
+  }
+  #header a, #user-tools a { color: var(--text-secondary) !important; }
+  #header a:hover { color: var(--gold) !important; text-decoration: none !important; }
+  #user-tools { color: var(--text-muted) !important; font-size: .78rem !important; }
+  div.breadcrumbs {
+    background: #000 !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 8px 24px !important;
+    font-size: .78rem !important;
+    color: var(--text-muted) !important;
+  }
+  div.breadcrumbs a { color: var(--text-secondary) !important; }
+  div.breadcrumbs a:hover { color: var(--gold) !important; }
+  #content { padding: 28px 32px !important; }
+
+  .page-title { font-size: 1.5rem; font-weight: 700; letter-spacing: -.01em; color: var(--text-primary); margin: 0 0 6px; }
+  .page-subtitle { font-size: .8rem; color: var(--text-muted); margin: 0 0 28px; text-transform: uppercase; letter-spacing: .08em; }
+
+  .admin-nav { display: flex; gap: 8px; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .admin-nav a {
+    display: inline-block; padding: 6px 16px; border-radius: var(--radius);
+    font-size: .78rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    text-decoration: none !important; border: 1px solid var(--border); color: var(--text-secondary);
+    background: var(--bg-surface); transition: border-color .15s, color .15s, background .15s;
+  }
+  .admin-nav a:hover { background: var(--bg-raised); color: var(--text-primary); border-color: var(--text-muted); }
+  .admin-nav a.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+  .section-label {
+    font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-muted); margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle);
+  }
+
+  /* Info banner */
+  .info-banner {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 28px;
+    font-size: .84rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Collections grid */
+  .col-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .col-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--gold);
+    border-radius: var(--radius-lg);
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-decoration: none !important;
+    color: inherit;
+    transition: border-color .2s, background .2s;
+  }
+  .col-card:hover { background: var(--bg-raised); border-color: var(--gold); }
+  .col-name { font-size: .95rem; font-weight: 700; color: var(--text-primary); }
+  .col-count { font-size: .78rem; color: var(--text-muted); }
+  .col-count strong { color: var(--gold); }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+  .empty-state h3 { font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+
+  .error-box {
+    background: rgba(180,40,40,.12); border: 1px solid rgba(180,40,40,.4);
+    border-radius: var(--radius); color: #e07070; padding: 12px 16px; font-size: .84rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Firestore Browser</h1>
+<p class="page-subtitle">Firebase — Raw Collection View</p>
+
+<nav class="admin-nav">
+  <a href="/admin/dashboard/">Dashboard</a>
+  <a href="/admin/firestore/" class="active">Firestore Browser</a>
+  <a href="/admin/base/profile/">Profiles</a>
+  <a href="/admin/base/group/">Groups</a>
+  <a href="/admin/auth/user/">Users</a>
+</nav>
+
+<div class="info-banner">
+  Read-only raw view of your Firebase Firestore database. Click a collection to browse its documents. All data is fetched live from Firestore.
+</div>
+
+<p class="section-label">Collections</p>
+
+{% if error %}
+  <div class="error-box">{{ error }}</div>
+{% elif not collections %}
+  <div class="empty-state">
+    <h3>No collections found</h3>
+    <p>Firestore is connected but empty, or Firebase has not yet been initialized.</p>
+  </div>
+{% else %}
+  <div class="col-grid">
+    {% for col in collections %}
+    <a href="/admin/firestore/{{ col.id }}/" class="col-card">
+      <div class="col-name">{{ col.id }}</div>
+      <div class="col-count"><strong>{{ col.doc_count }}</strong> document{{ col.doc_count|pluralize }}</div>
+    </a>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock %}
