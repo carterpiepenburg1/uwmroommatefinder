@@ -341,16 +341,6 @@ class Group(models.Model):
     def __str__(self):
         return self.name or f"Group {self.id}"
 
-class GroupLike(models.Model):
-    liker = models.ForeignKey(Group, related_name='likes_given', on_delete=models.CASCADE)
-    liked = models.ForeignKey(Group, related_name='likes_received', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('liker', 'liked')
-
-    def __str__(self):
-        return f"{self.liker} likes {self.liked}"
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -384,8 +374,14 @@ class Profile(models.Model):
     alcohol_policy_priority    = models.BooleanField(default=False)
     shared_belongings_priority = models.BooleanField(default=False)
 
+    # Visibility
+    is_active = models.BooleanField(default=True)
+
     # Group
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, related_name='members', null=True, blank=True)
+
+    #Roommate Requests (works both ways because of related name "outgoing_requests")
+    incoming_requests = models.ManyToManyField('self', symmetrical=False, related_name='outgoing_requests', blank=True)
 
     def __str__(self):
         return self.user.username

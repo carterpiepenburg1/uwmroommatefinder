@@ -1,0 +1,244 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:      #121212;
+    --surface: #1e1e1e;
+    --raised:  #2a2a2a;
+    --border:  #333333;
+    --gold:    #FFBD00;
+    --text:    #f0f0f0;
+    --muted:   #888888;
+    /* Semantic */
+    --male:    #3b82f6;  /* blue  */
+    --female:  #FFBD00;  /* gold/yellow */
+    --other:   #6b7280;  /* gray */
+    --spring:  #22c55e;  /* green */
+    --fall:    #f59e0b;  /* amber */
+  }
+
+  #content { padding: 24px 28px !important; }
+
+  /* ── Page title ── */
+  .dash-title   { font-size: 1.4rem; font-weight: 700; color: var(--text); margin: 0 0 4px; letter-spacing: -.01em; }
+  .dash-sub     { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; margin: 0 0 24px; }
+
+  /* ── Top nav ── */
+  .dash-nav { display: flex; gap: 8px; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .dash-nav a {
+    padding: 5px 14px; border-radius: 4px; font-size: .75rem; font-weight: 600;
+    letter-spacing: .04em; text-transform: uppercase; text-decoration: none !important;
+    border: 1px solid var(--border); color: #aaa !important; background: var(--surface);
+    transition: .15s;
+  }
+  .dash-nav a:hover { color: var(--text) !important; border-color: #555; }
+  .dash-nav a.cur  { background: var(--gold); color: #000 !important; border-color: var(--gold); }
+
+  /* ── Section label ── */
+  .sec { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 0 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+  /* ── Stat cards ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 18px 16px;
+    border-left: 3px solid var(--border); transition: border-color .2s;
+  }
+  .card:hover { border-left-color: var(--gold); }
+  .card.c-gold  { border-left-color: var(--gold); }
+  .card.c-blue  { border-left-color: var(--male); }
+  .card.c-green { border-left-color: var(--spring); }
+  .card-label { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 8px; }
+  .card-value { font-size: 2rem; font-weight: 800; color: var(--text); line-height: 1; }
+  .card-desc  { font-size: .7rem; color: var(--muted); margin-top: 5px; }
+
+  /* ── Chart grid ── */
+  .charts { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 18px; }
+  .chart-label { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); margin: 0 0 14px; }
+  canvas { max-height: 190px !important; }
+
+  /* ── Firestore panel ── */
+  .fs-panel { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold); border-radius: 6px; padding: 20px; margin-bottom: 20px; }
+  .fs-row   { display: flex; gap: 36px; margin-bottom: 16px; flex-wrap: wrap; }
+  .fs-lbl   { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); margin-bottom: 4px; }
+  .fs-val   { font-size: 1.8rem; font-weight: 800; color: var(--text); }
+  .fs-sub   { font-size: .7rem; color: var(--muted); margin-top: 2px; }
+  .fs-link  {
+    display: inline-block; padding: 6px 14px; border: 1px solid var(--gold); border-radius: 4px;
+    font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--gold) !important; text-decoration: none !important; transition: .15s;
+  }
+  .fs-link:hover { background: rgba(255,189,0,.12); }
+
+  /* ── Error ── */
+  .err { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 5px; color: #f87171; padding: 10px 14px; font-size: .82rem; margin-top: 8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="dash-title">Analytics Dashboard</h1>
+<p class="dash-sub">UWM Roommate Finder — Admin Portal</p>
+
+<nav class="dash-nav">
+  <a href="/admin/dashboard/" class="cur">Dashboard</a>
+  <a href="/admin/firestore/">Firestore</a>
+  <a href="/admin/base/profile/">Profiles</a>
+  <a href="/admin/base/group/">Groups</a>
+  <a href="/admin/auth/user/">Users</a>
+</nav>
+
+<!-- Stat cards -->
+<p class="sec">PostgreSQL — Record Counts</p>
+<div class="cards">
+  <div class="card c-gold">
+    <div class="card-label">Total Users</div>
+    <div class="card-value">{{ total_users }}</div>
+    <div class="card-desc">Auth accounts</div>
+  </div>
+  <div class="card c-gold">
+    <div class="card-label">Profiles</div>
+    <div class="card-value">{{ total_profiles }}</div>
+    <div class="card-desc">Profile objects</div>
+  </div>
+  <div class="card c-green">
+    <div class="card-label">Complete</div>
+    <div class="card-value">{{ complete_profiles }}</div>
+    <div class="card-desc">Fully filled-in</div>
+  </div>
+  <div class="card c-blue">
+    <div class="card-label">Active</div>
+    <div class="card-value">{{ active_profiles }}</div>
+    <div class="card-desc">is_active = True</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Groups</div>
+    <div class="card-value">{{ total_groups }}</div>
+    <div class="card-desc">Roommate groups</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Pending Requests</div>
+    <div class="card-value">{{ pending_requests }}</div>
+    <div class="card-desc">Incoming requests</div>
+  </div>
+</div>
+
+<!-- Charts -->
+<p class="sec">Distributions</p>
+<div class="charts">
+
+  <!-- Gender: blue = male, gold = female, gray = other -->
+  <div class="chart-card">
+    <p class="chart-label">Gender</p>
+    <canvas id="gChart"></canvas>
+  </div>
+
+  <!-- Term: green = spring, amber = fall -->
+  <div class="chart-card">
+    <p class="chart-label">Term</p>
+    <canvas id="tChart"></canvas>
+  </div>
+
+  <!-- Standing: monochromatic blues -->
+  <div class="chart-card">
+    <p class="chart-label">Academic Standing</p>
+    <canvas id="sChart"></canvas>
+  </div>
+
+  <!-- Dorm: neutral palette -->
+  <div class="chart-card">
+    <p class="chart-label">Dorm Building</p>
+    <canvas id="dChart"></canvas>
+  </div>
+
+</div>
+
+<!-- Firestore -->
+<p class="sec">Firebase Firestore — Live Counts</p>
+<div class="fs-panel">
+  {% if firestore_stats.error %}
+    <div class="err">Firestore unavailable: {{ firestore_stats.error }}</div>
+  {% else %}
+  <div class="fs-row">
+    <div>
+      <div class="fs-lbl">Conversations</div>
+      <div class="fs-val">{{ firestore_stats.conversations }}</div>
+      <div class="fs-sub">Documents in Firestore</div>
+    </div>
+    <div>
+      <div class="fs-lbl">Messages</div>
+      <div class="fs-val">{{ firestore_stats.messages }}</div>
+      <div class="fs-sub">Across all conversations</div>
+    </div>
+  </div>
+  {% endif %}
+  <a href="/admin/firestore/" class="fs-link">Open Firestore Browser</a>
+</div>
+
+<script id="chart-data" type="application/json">
+{
+  "genderLabels":   {{ gender_labels|safe }},
+  "genderData":     {{ gender_data|safe }},
+  "termLabels":     {{ term_labels|safe }},
+  "termData":       {{ term_data|safe }},
+  "standingLabels": {{ standing_labels|safe }},
+  "standingData":   {{ standing_data|safe }},
+  "dormLabels":     {{ dorm_labels|safe }},
+  "dormData":       {{ dorm_data|safe }}
+}
+</script>
+
+<script>
+(function () {
+  Chart.defaults.color       = '#888';
+  Chart.defaults.borderColor = '#2a2a2a';
+
+  const d = JSON.parse(document.getElementById('chart-data').textContent);
+
+  /* ── helpers ── */
+  function donut(id, labels, data, colors) {
+    const ctx = document.getElementById(id);
+    if (!ctx || !data.length) return;
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#1e1e1e', borderWidth: 2, hoverOffset: 5 }] },
+      options: { responsive: true, cutout: '60%', plugins: { legend: { position: 'right', labels: { color: '#aaa', font: { size: 11 }, padding: 12, boxWidth: 11 } } } }
+    });
+  }
+
+  function bar(id, labels, data, colors) {
+    const ctx = document.getElementById(id);
+    if (!ctx || !data.length) return;
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 4, borderSkipped: false }] },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: '#262626' }, ticks: { color: '#777', font: { size: 10 } } },
+          y: { beginAtZero: true, grid: { color: '#262626' }, ticks: { color: '#777', font: { size: 10 }, stepSize: 1 } }
+        }
+      }
+    });
+  }
+
+  /* ── Gender: blue / gold / gray ── */
+  const GENDER_COLOR = { 'Male': '#3b82f6', 'Female': '#FFBD00', 'Other': '#6b7280' };
+  donut('gChart', d.genderLabels, d.genderData, d.genderLabels.map(function(l) { return GENDER_COLOR[l] || '#6b7280'; }));
+
+  /* ── Term: Spring = green, Fall = amber ── */
+  const TERM_COLOR = { 'Spring': '#22c55e', 'Fall': '#f59e0b' };
+  donut('tChart', d.termLabels, d.termData, d.termLabels.map(function(l) { return TERM_COLOR[l] || '#6b7280'; }));
+
+  /* ── Standing: blue gradient ── */
+  bar('sChart', d.standingLabels, d.standingData, ['#1d4ed8','#3b82f6','#60a5fa','#93c5fd']);
+
+  /* ── Dorm: neutral slate tones ── */
+  donut('dChart', d.dormLabels, d.dormData, ['#64748b','#94a3b8','#475569','#cbd5e1']);
+})();
+</script>
+{% endblock %}

@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import '../styles/ProfileSetupForm.css';
+import FieldHint from './FieldHint';
 
 const PREFERENCE_FIELDS = [
-  { key: 'noise_level',       label: 'Noise Level',       options: [[0, 'Quiet'], [1, 'Moderate'], [2, 'Lively']] },
-  { key: 'cleanliness',       label: 'Cleanliness',       options: [[0, 'Very Clean'], [1, 'Moderate'], [2, 'Relaxed']] },
-  { key: 'sleep_habits',      label: 'Sleep Habits',      options: [[0, 'Early Bird'], [1, 'Moderate'], [2, 'Night Owl']] },
-  { key: 'social_level',      label: 'Social Level',      options: [[0, 'Introvert'], [1, 'Ambivert'], [2, 'Extrovert']] },
-  { key: 'guest_policy',      label: 'Guest Policy',      options: [[0, 'Barely'], [1, 'Occasionally'], [2, 'Frequently']] },
-  { key: 'alcohol_policy',    label: 'Alcohol Policy',    options: [[0, 'Strictly Dry'], [1, 'Occasionally'], [2, 'Comfortable']] },
-  { key: 'shared_belongings', label: 'Shared Belongings', options: [[0, 'Keep Separate'], [1, 'Ask First'], [2, 'Share Everything']] },
+  { key: 'noise_level', label: 'Noise Level', hint: 'How much noise is acceptable in your living space?', options: [[0, 'Quiet'], [1, 'Moderate'], [2, 'Lively']] },
+  { key: 'cleanliness', label: 'Cleanliness', hint: 'How tidy do you expect your shared living space to be?', options: [[0, 'Very Clean'], [1, 'Moderate'], [2, 'Relaxed']] },
+  { key: 'sleep_habits', label: 'Sleep Habits', hint: 'Are you an early bird, night owl, or somewhere in between?', options: [[0, 'Early Bird'], [1, 'Moderate'], [2, 'Night Owl']] },
+  { key: 'social_level', label: 'Social Level', hint: 'How social do you tend to be?', options: [[0, 'Introvert'], [1, 'Ambivert'], [2, 'Extrovert']] },
+  { key: 'guest_policy', label: 'Guest Policy', hint: 'How often can your roommate bring guests over?', options: [[0, 'Barely'], [1, 'Occasionally'], [2, 'Frequently']] },
+  { key: 'alcohol_policy', label: 'Alcohol Policy', hint: 'What is your stance on alcohol in the living space?', options: [[0, 'Strictly Dry'], [1, 'Occasionally'], [2, 'Comfortable']] },
+  { key: 'shared_belongings', label: 'Shared Belongings', hint: 'How do you feel about sharing personal belongings with your roommate?', options: [[0, 'Keep Separate'], [1, 'Ask First'], [2, 'Share Everything']] },
 ];
 
 const buildInitialState = (user) => {
@@ -64,10 +65,13 @@ const PreferencesForm = ({ user, onComplete }) => {
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px', textAlign: 'left' }}>
-          {PREFERENCE_FIELDS.map(({ key, label, options }) => (
+          {PREFERENCE_FIELDS.map(({ key, label, hint, options }) => (
             <div key={key}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                <label>{label}</label>
+                <label>
+                  {label}
+                  <FieldHint text={hint} />
+                </label>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#FFBD00', cursor: 'pointer' }}>
                   <input
                     type="checkbox"

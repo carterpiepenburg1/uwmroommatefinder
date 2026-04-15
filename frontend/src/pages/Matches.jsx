@@ -1,93 +1,103 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import MatchCard from "../components/MatchCard";
+import "../styles/Matches.css";
+
+const PAGE_SIZE = 10;
 
 function Matches() {
   const [matches, setMatches] = useState([]);
+  const [pendingIds, setPendingIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const [page, setPage] = useState(0);
 
-  // Load matches on mount
   useEffect(() => {
     document.title = "Explore and Connect | Roommate Finder";
-    fetchMatches();
+    fetch("http://localhost:8000/api/matches/potential/", { credentials: "include" })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to load matches");
+        return res.json();
+      })
+      .then(data => {
+        setMatches(data.matches || []);
+        setPendingIds(new Set(data.pending_request_ids || []));
+      })
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
-  const fetchMatches = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch("http://localhost:8000/api/matches/potential/", {
-        credentials: "include", // Needs Django session cookie
+  const handleMatchRequest = (userId) => {
+    setPendingIds(prev => new Set([...prev, userId]));
+    fetch(`http://localhost:8000/api/match/request/${userId}/`, {
+      method: "POST",
+      credentials: "include",
+    }).catch(() => {
+      // revert optimistic update on failure
+      setPendingIds(prev => {
+        const next = new Set(prev);
+        next.delete(userId);
+        return next;
       });
-      if (!res.ok) throw new Error("Failed to load potential matches");
-      const data = await res.json();
-      setMatches(data.matches || []);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
-  const handleLike = async (groupId) => {
-    try {
-      const res = await fetch("http://localhost:8000/api/matches/like/", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ group_id: groupId }),
-      });
-
-      if (!res.ok) throw new Error("Failed to like group");
-      const data = await res.json();
-
-      // Remove the liked group from the list immediately
-      setMatches((prev) => prev.filter((m) => m.group_id !== groupId));
-
-      if (data.is_match) {
-        // If it's a mutual like, notify the user!
-        alert("🎉 It's a Match! A new chat has been created.");
-        // Redirect them to the chat to start talking
-        navigate("/chat");
-      }
-    } catch (err) {
-      alert("Error liking group: " + err.message);
-    }
-  };
-
-  const handlePass = (groupId) => {
-    // For now, "Pass" just removes them from the local UI state.
-    // In a full implementation, you'd send this to the backend so they don't show up again.
-    setMatches((prev) => prev.filter((m) => m.group_id !== groupId));
-  };
-
-  if (loading) return <div style={{ padding: "2rem" }}>Loading potential matches...</div>;
+  if (loading) return <div style={{ padding: "2rem", color: "white" }}>Loading matches...</div>;
   if (error) return <div style={{ padding: "2rem", color: "red" }}>Error: {error}</div>;
 
-  return (
-    <div style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
-      <h1 style={{ color: "var(--uwm-gold)", marginBottom: "0.5rem" }}>Explore and Connect</h1>
-      <p style={{ color: "#aaa", marginBottom: "2rem" }}>Find potential roommates and groups.</p>
+  const allMatches = matches;
+  const totalPages = Math.ceil(allMatches.length / PAGE_SIZE);
+  const pageMatches = allMatches.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
-      {matches.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "3rem", background: "var(--uwm-dark)", borderRadius: "8px" }}>
-          <h3>No more matches right now</h3>
-          <p style={{ color: "#aaa", marginTop: "1rem" }}>
-            Check back later as more users join!
-          </p>
+  return (
+    <div className="matches-page">
+      <h1 className="matches-title">Explore and Connect</h1>
+      <p className="matches-subtitle">Showing your top matches based on compatibility.</p>
+
+      {allMatches.length === 0 ? (
+        <div className="matches-empty">
+          <h3>No matches found right now</h3>
+          <p>Make sure your profile and preferences are complete, and check back as more users join.</p>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          {matches.map((group) => (
-            <MatchCard
-              key={group.group_id}
-              group={group}
-              onLike={handleLike}
-              onPass={handlePass}
-            />
-          ))}
-        </div>
+        <>
+          <div className="matches-list">
+            {pageMatches.map(match => (
+              <div key={match.id}>
+                <MatchCard match={match} />
+                <div className="match-card-actions">
+                  <button
+                    className={`match-btn ${pendingIds.has(match.id) ? "match-btn-pending" : "match-btn-accept"}`}
+                    onClick={() => handleMatchRequest(match.id)}
+                    disabled={pendingIds.has(match.id)}
+                  >
+                    {pendingIds.has(match.id) ? "Pending" : "Match"}
+                  </button>
+                  <button className="match-btn match-btn-deny">Skip</button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="matches-pagination">
+            <button
+              className="matches-pagination-btn"
+              onClick={() => setPage(p => p - 1)}
+              disabled={page === 0}
+            >
+              Previous
+            </button>
+            <span className="matches-pagination-label">
+              Page {page + 1} of {totalPages}
+            </span>
+            <button
+              className="matches-pagination-btn"
+              onClick={() => setPage(p => p + 1)}
+              disabled={page >= totalPages - 1}
+            >
+              Next
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

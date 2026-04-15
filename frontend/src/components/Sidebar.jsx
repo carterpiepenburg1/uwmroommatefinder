@@ -27,6 +27,9 @@ function Sidebar() {
             <Link to="/profile">Profile</Link>
           </li>
           <li>
+            <Link to="/checklist">Checklist</Link>
+          </li>
+          <li>
             <Link to="/matches">Explore and Connect</Link>
           </li>
           <li>

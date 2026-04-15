@@ -1,0 +1,523 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} — UWM Roommate Finder Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+  <a href="{% url 'uwm_admin:admin_dashboard' %}">UWM Roommate Finder</a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{# Remove the built-in light/dark toggle button entirely #}
+{% block theme-toggle %}{% endblock %}
+
+{# Force dark mode before first paint — prevents any flash of white #}
+{% block extrahead %}
+{{ block.super }}
+<script>
+  document.documentElement.setAttribute('data-theme', 'dark');
+  try { localStorage.setItem('django-admin-theme', 'dark'); } catch (e) { }
+</script>
+{% endblock %}
+
+{% block extrastyle %}
+<style>
+  :root {
+    --bg: #121212;
+    --surface: #1e1e1e;
+    --raised: #2a2a2a;
+    --border: #333333;
+    --gold: #FFBD00;
+    --text: #f0f0f0;
+    --muted: #888888;
+  }
+
+  /* Universal dark base */
+  html,
+  body {
+    background: var(--bg) !important;
+    color: var(--text) !important;
+  }
+
+  * {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    box-sizing: border-box;
+  }
+
+  /* Every div/section/aside/nav to dark */
+  #header,
+  #container,
+  #main,
+  #content,
+  #content-main,
+  #content-related,
+  #changelist-filter,
+  .colMS,
+  .colSM,
+  .module,
+  .inline-group,
+  .submit-row,
+  .object-tools,
+  fieldset,
+  .form-row,
+  .actions,
+  #footer,
+  div,
+  aside,
+  nav {
+    background-color: var(--bg) !important;
+    color: var(--text) !important;
+  }
+
+  /* ── Header ── */
+  #header {
+    background: #000 !important;
+    border-bottom: 3px solid var(--gold) !important;
+    padding: 12px 24px !important;
+  }
+
+  #site-name a {
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: .92rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: .05em !important;
+  }
+
+  #header a {
+    color: #aaa !important;
+    text-decoration: none !important;
+  }
+
+  #header a:hover {
+    color: var(--gold) !important;
+  }
+
+  #user-tools {
+    color: var(--muted) !important;
+    font-size: .75rem !important;
+  }
+
+  #user-tools a {
+    color: #aaa !important;
+  }
+
+  #user-tools a:hover {
+    color: var(--gold) !important;
+  }
+
+  /* ── Breadcrumbs ── */
+  div.breadcrumbs {
+    background: #000 !important;
+    color: var(--muted) !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 7px 24px !important;
+    font-size: .75rem !important;
+  }
+
+  div.breadcrumbs a {
+    color: #aaa !important;
+  }
+
+  div.breadcrumbs a:hover {
+    color: var(--gold) !important;
+  }
+
+  /* ── All links ── */
+  a {
+    color: #aaa !important;
+    text-decoration: none !important;
+  }
+
+  a:hover {
+    color: var(--gold) !important;
+  }
+
+  /* ── Module blocks (app index) ── */
+  .module {
+    border: 1px solid var(--border) !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+    margin-bottom: 16px !important;
+  }
+
+  .module caption,
+  .module>h2 {
+    background: #000 !important;
+    color: var(--muted) !important;
+    font-size: .68rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .1em !important;
+    padding: 9px 14px !important;
+    margin: 0 !important;
+  }
+
+  /* ── Tables ── */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  thead,
+  thead tr,
+  thead th {
+    background: #000 !important;
+    color: var(--muted) !important;
+  }
+
+  th {
+    font-size: .68rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .08em !important;
+    padding: 10px 14px !important;
+    border-bottom: 1px solid var(--border) !important;
+    color: var(--muted) !important;
+  }
+
+  td {
+    padding: 9px 14px !important;
+    border-bottom: 1px solid var(--border) !important;
+    color: var(--text) !important;
+  }
+
+  tr:last-child td {
+    border-bottom: none !important;
+  }
+
+  tr.row1 {
+    background: var(--surface) !important;
+  }
+
+  tr.row2 {
+    background: var(--raised) !important;
+  }
+
+  tbody tr:hover td {
+    background: #303030 !important;
+  }
+
+  th a {
+    color: var(--muted) !important;
+  }
+
+  th a:hover {
+    color: var(--gold) !important;
+  }
+
+  th.sorted {
+    color: var(--gold) !important;
+  }
+
+  th.sorted a {
+    color: var(--gold) !important;
+  }
+
+  /* ── Filter sidebar ── */
+  #changelist-filter {
+    border-left: 1px solid var(--border) !important;
+    padding: 0 !important;
+  }
+
+  #changelist-filter h2 {
+    background: #000 !important;
+    color: var(--muted) !important;
+    font-size: .68rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .1em !important;
+    padding: 10px 14px !important;
+    margin: 0 !important;
+  }
+
+  #changelist-filter h3 {
+    color: var(--muted) !important;
+    font-size: .68rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .08em !important;
+    padding: 10px 14px 4px !important;
+    margin: 0 !important;
+  }
+
+  #changelist-filter ul {
+    padding: 4px 14px 12px !important;
+    list-style: none !important;
+    margin: 0 !important;
+  }
+
+  #changelist-filter li {
+    padding: 3px 0 !important;
+  }
+
+  #changelist-filter li a {
+    color: #aaa !important;
+    font-size: .84rem !important;
+  }
+
+  #changelist-filter li a:hover {
+    color: var(--gold) !important;
+  }
+
+  #changelist-filter li.selected a {
+    color: var(--gold) !important;
+    font-weight: 700 !important;
+  }
+
+  /* ── Form fields ── */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="url"],
+  input[type="search"],
+  select,
+  textarea {
+    background: var(--raised) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 4px !important;
+    padding: 6px 10px !important;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: 2px solid var(--gold) !important;
+  }
+
+  input::placeholder {
+    color: var(--muted) !important;
+  }
+
+  label {
+    color: #ccc !important;
+    font-size: .84rem !important;
+  }
+
+  .help {
+    color: var(--muted) !important;
+    font-size: .75rem !important;
+  }
+
+  .form-row {
+    border-bottom: 1px solid var(--border) !important;
+  }
+
+  fieldset {
+    border: 1px solid var(--border) !important;
+    border-radius: 6px !important;
+    margin-bottom: 16px !important;
+    overflow: hidden !important;
+  }
+
+  fieldset h2 {
+    background: #000 !important;
+    color: var(--muted) !important;
+    font-size: .68rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .1em !important;
+    padding: 9px 14px !important;
+    margin: 0 !important;
+  }
+
+  input[type="checkbox"] {
+    accent-color: var(--gold) !important;
+  }
+
+  /* ── Action bar ── */
+  .actions {
+    border: 1px solid var(--border) !important;
+    border-radius: 5px !important;
+    padding: 8px 12px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .actions label {
+    color: #aaa !important;
+  }
+
+  .actions select {
+    background: var(--raised) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 4px !important;
+  }
+
+  span.action-counter {
+    color: var(--gold) !important;
+  }
+
+  /* ── Buttons ── */
+  .button,
+  input[type="submit"],
+  .submit-row input,
+  input[type="button"],
+  .submit-row button {
+    background: var(--gold) !important;
+    color: #000 !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-weight: 700 !important;
+    font-size: .78rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: .05em !important;
+    padding: 8px 18px !important;
+    cursor: pointer !important;
+  }
+
+  .button:hover,
+  input[type="submit"]:hover {
+    opacity: .85 !important;
+  }
+
+  .submit-row {
+    border-top: 1px solid var(--border) !important;
+    padding: 12px 16px !important;
+  }
+
+  .deletelink {
+    color: #e07070 !important;
+    font-size: .78rem !important;
+  }
+
+  .deletelink:hover {
+    color: #ff9090 !important;
+  }
+
+  .object-tools a {
+    color: #aaa !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 4px !important;
+    padding: 4px 12px !important;
+    font-size: .75rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: .04em !important;
+  }
+
+  .object-tools a:hover {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+  }
+
+  /* ── Pagination ── */
+  .paginator {
+    color: var(--muted) !important;
+    font-size: .8rem !important;
+    padding: 10px 0 !important;
+  }
+
+  .paginator a {
+    color: #aaa !important;
+    padding: 3px 9px !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 4px !important;
+  }
+
+  .paginator a:hover {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+  }
+
+  .paginator .this-page {
+    color: var(--gold) !important;
+    font-weight: 700 !important;
+    padding: 3px 9px !important;
+    border: 1px solid var(--gold) !important;
+    border-radius: 4px !important;
+  }
+
+  /* ── Messages ── */
+  .messagelist li {
+    border-radius: 5px !important;
+    padding: 10px 14px !important;
+    margin-bottom: 6px !important;
+    list-style: none !important;
+  }
+
+  .messagelist .success {
+    background: rgba(34, 197, 94, .12) !important;
+    border: 1px solid rgba(34, 197, 94, .3) !important;
+    color: #4ade80 !important;
+  }
+
+  .messagelist .error {
+    background: rgba(239, 68, 68, .12) !important;
+    border: 1px solid rgba(239, 68, 68, .3) !important;
+    color: #f87171 !important;
+  }
+
+  .messagelist .warning {
+    background: rgba(255, 189, 0, .1) !important;
+    border: 1px solid rgba(255, 189, 0, .3) !important;
+    color: var(--gold) !important;
+  }
+
+  /* ── Footer ── */
+  #footer {
+    background: #000 !important;
+    color: var(--muted) !important;
+    border-top: 1px solid var(--border) !important;
+    font-size: .73rem !important;
+    padding: 10px 24px !important;
+  }
+
+  #footer a {
+    color: var(--muted) !important;
+  }
+
+  /* ── Inline admins ── */
+  .inline-related h3 {
+    background: #000 !important;
+    color: var(--muted) !important;
+    font-size: .68rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: .1em !important;
+    padding: 9px 14px !important;
+    margin: 0 !important;
+  }
+
+  .add-row a {
+    color: var(--gold) !important;
+    font-size: .8rem !important;
+  }
+
+  .delete-row a {
+    color: #e07070 !important;
+  }
+
+  /* ── Selector widget ── */
+  .selector-available h2,
+  .selector-chosen h2 {
+    background: #000 !important;
+    color: var(--muted) !important;
+  }
+
+  .selector ul {
+    background: var(--raised) !important;
+    border: 1px solid var(--border) !important;
+  }
+
+  .selector li {
+    color: var(--text) !important;
+  }
+
+  .selector li:hover {
+    background: var(--gold) !important;
+    color: #000 !important;
+  }
+
+  /* ── Hide theme toggle button (Django 5.x injects this outside overridable blocks) ── */
+  #toggle-nav-sidebar,
+  button[data-toggle-theme],
+  .theme-toggle,
+  [class*="theme-toggle"] {
+    display: none !important;
+  }
+</style>
+{% endblock %}

@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 import firebase_admin
 import firebase_admin.auth as fb_auth
 from firebase_admin import firestore
@@ -46,6 +46,7 @@ def current_user(request):
             'last_name': request.user.last_name,
             
             'is_profile_complete': profile.is_profile_complete,
+            'is_active': profile.is_active,
             'is_preferences_complete': all(
                 getattr(profile, f) is not None
                 for f in ['noise_level', 'cleanliness', 'sleep_habits', 'social_level', 'guest_policy', 'alcohol_policy', 'shared_belongings']
@@ -243,6 +244,21 @@ def update_preferences(request):
     return JsonResponse({"message": "Preferences updated!"})
 
 
+@csrf_exempt
+def toggle_active(request):
+    if request.method != 'POST' or not request.user.is_authenticated:
+        return JsonResponse({"error": "Unauthorized or bad request"}, status=400)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    profile = request.user.profile
+    profile.is_active = bool(data.get('is_active', True))
+    profile.save()
+    return JsonResponse({"is_active": profile.is_active})
+
+
 def get_programs(request):
     # Program.choices automatically returns a list of tuples like:
     # [('CS', 'Computer Science'), ('ART', 'Art'), ...]
@@ -252,143 +268,193 @@ def get_programs(request):
     
     return JsonResponse({"programs": program_list})
 
-@csrf_exempt
+PREF_FIELDS = [
+    'noise_level', 'cleanliness', 'sleep_habits',
+    'social_level', 'guest_policy', 'alcohol_policy', 'shared_belongings',
+]
+
+def compute_compatibility(my_profile, their_profile):
+    """
+    Returns a 0–100 compatibility score (higher = better match).
+    Uses the current user's priority flags to weight each field.
+    Missing values default to 1 (the middle option).
+    """
+    raw = 0
+    max_possible = 0
+    for field in PREF_FIELDS:
+        my_val    = getattr(my_profile, field)
+        their_val = getattr(their_profile, field)
+        my_val    = my_val    if my_val    is not None else 1
+        their_val = their_val if their_val is not None else 1
+        weight = 5 if getattr(my_profile, f'{field}_priority') else 1
+        raw          += weight * abs(my_val - their_val)
+        max_possible += weight * 2  # max possible difference per field is 2
+    return round((1 - raw / max_possible) * 100)
+
+
+def _serialize_match(my_profile, their_profile, program_dict):
+    """Serializes a profile into the shape expected by the MatchCard component."""
+    u = their_profile.user
+    return {
+        "id": u.pk,
+        "name": f"{u.first_name} {u.last_name}".strip() or u.username,
+        "gender": their_profile.get_gender_display(),
+        "standing": their_profile.get_standing_display(),
+        "term": their_profile.get_term_display(),
+        "dorm_building": their_profile.get_dorm_building_display(),
+        "room_type": their_profile.get_room_type_display(),
+        "programs": [program_dict.get(p, p) for p in their_profile.programs],
+        "noise_level_display": their_profile.get_noise_level_display(),
+        "cleanliness_display": their_profile.get_cleanliness_display(),
+        "sleep_habits_display": their_profile.get_sleep_habits_display(),
+        "social_level_display": their_profile.get_social_level_display(),
+        "guest_policy_display": their_profile.get_guest_policy_display(),
+        "alcohol_policy_display": their_profile.get_alcohol_policy_display(),
+        "shared_belongings_display": their_profile.get_shared_belongings_display(),
+        "noise_level_priority": their_profile.noise_level_priority,
+        "cleanliness_priority": their_profile.cleanliness_priority,
+        "sleep_habits_priority": their_profile.sleep_habits_priority,
+        "social_level_priority": their_profile.social_level_priority,
+        "guest_policy_priority": their_profile.guest_policy_priority,
+        "alcohol_policy_priority": their_profile.alcohol_policy_priority,
+        "shared_belongings_priority": their_profile.shared_belongings_priority,
+        "compatibility_score": compute_compatibility(my_profile, their_profile),
+    }
+
+
 def get_potential_matches(request):
     """
-    Naive matching: Returns all groups the current user is NOT in,
-    and hasn't already liked. Group members are serialized.
+    Returns individual users sorted by compatibility score.
+    Filters: is_active, same term, same dorm, compatible gender, different group.
+    Also returns pending_request_ids so the frontend can gray out sent requests.
     """
     if not request.user.is_authenticated:
         return JsonResponse({"error": "Not authenticated"}, status=401)
-        
-    my_profile = request.user.profile
-    my_group = my_profile.group
-    
-    if not my_group:
-        from .models import Group
-        my_group = Group.objects.create(name=f"{request.user.username}'s Group")
-        my_profile.group = my_group
-        my_profile.save()
 
-    # Get IDs of groups we've already liked
-    from .models import GroupLike, Group
-    liked_group_ids = GroupLike.objects.filter(liker=my_group).values_list('liked_id', flat=True)
-    
-    # Get all other groups we haven't liked yet
-    potential_groups = Group.objects.exclude(id=my_group.id).exclude(id__in=liked_group_ids)
-    
-    matches_data = []
-    for group in potential_groups:
-        members_data = []
-        for member_profile in group.members.all():
-            m_user = member_profile.user
-            members_data.append({
-                "id": m_user.pk,
-                "name": f"{m_user.first_name} {m_user.last_name}".strip() or m_user.username,
-                "gender": member_profile.get_gender_display(),
-                "standing": member_profile.get_standing_display(),
-                "programs": [dict(Program.choices).get(p, p) for p in member_profile.programs]
-            })
-            
-        matches_data.append({
-            "group_id": group.id,
-            "group_name": group.name,
-            "members": members_data
-        })
-        
-    return JsonResponse({"matches": matches_data})
+    my_profile = request.user.profile
+
+    candidates = Profile.objects.filter(is_active=True).exclude(user=request.user)
+
+    # Exclude users already in the same group (already matched)
+    if my_profile.group:
+        candidates = candidates.exclude(group=my_profile.group)
+
+    # Hard filter: same term
+    if my_profile.term:
+        candidates = candidates.filter(term=my_profile.term)
+
+    # Hard filter: same dorm building
+    if my_profile.dorm_building:
+        candidates = candidates.filter(dorm_building=my_profile.dorm_building)
+
+    # Hard filter: gender — O sees everyone, M sees M+O, F sees F+O
+    if my_profile.gender == 'M':
+        candidates = candidates.filter(gender__in=['M', 'O'])
+    elif my_profile.gender == 'F':
+        candidates = candidates.filter(gender__in=['F', 'O'])
+
+    program_dict = dict(Program.choices)
+    matches = [_serialize_match(my_profile, p, program_dict) for p in candidates]
+    matches.sort(key=lambda m: m["compatibility_score"], reverse=True)
+
+    pending_ids = list(my_profile.outgoing_requests.values_list('user__pk', flat=True))
+
+    return JsonResponse({"matches": matches, "pending_request_ids": pending_ids})
+
+
+def get_notifications(request):
+    """Returns incoming match requests for the current user."""
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Not authenticated"}, status=401)
+
+    my_profile = request.user.profile
+    program_dict = dict(Program.choices)
+
+    requests_data = [
+        _serialize_match(my_profile, sender_profile, program_dict)
+        for sender_profile in my_profile.incoming_requests.all()
+    ]
+    return JsonResponse({"requests": requests_data})
+
 
 @csrf_exempt
-def like_group(request):
+def send_match_request(request, user_id):
+    """Sends a match request from the current user to user_id."""
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Not authenticated"}, status=401)
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    target = get_object_or_404(User, pk=user_id)
+    if target == request.user:
+        return JsonResponse({"error": "Cannot request yourself"}, status=400)
+
+    target.profile.incoming_requests.add(request.user.profile)
+    return JsonResponse({"message": "Request sent"})
+
+
+@csrf_exempt
+def accept_match_request(request, user_id):
     """
-    Records that the current user's group 'likes' the target group.
-    If the target group has already liked us, it's a match!
-    Triggers Firebase chat creation.
+    Accepts a match request, merges groups, and creates/updates the group chat in Firestore.
+    The Firestore doc ID is 'group_{group_id}' so it's deterministic — adding a new member
+    to an existing group just updates the participants list on the same document.
     """
     if not request.user.is_authenticated:
         return JsonResponse({"error": "Not authenticated"}, status=401)
     if request.method != "POST":
         return JsonResponse({"error": "POST required"}, status=405)
-        
-    try:
-        body = json.loads(request.body)
-        target_group_id = body.get("group_id")
-    except (json.JSONDecodeError, AttributeError):
-        return JsonResponse({"error": "Invalid JSON"}, status=400)
-        
-    if not target_group_id:
-        return JsonResponse({"error": "group_id required"}, status=400)
 
-    from .models import GroupLike, Group
+    sender = get_object_or_404(User, pk=user_id)
     my_profile = request.user.profile
+    sender_profile = sender.profile
+
+    my_profile.incoming_requests.remove(sender_profile)
+
+    # Merge: move everyone from sender's group into mine, then delete theirs
+    their_group = sender_profile.group
     my_group = my_profile.group
-    
-    if not my_group:
-        my_group = Group.objects.create(name=f"{request.user.username}'s Group")
-        my_profile.group = my_group
-        my_profile.save()
-    
-    try:
-        target_group = Group.objects.get(id=target_group_id)
-    except Group.DoesNotExist:
-        return JsonResponse({"error": "Target group not found"}, status=404)
-        
-    # Prevent self-like
-    if my_group.id == target_group.id:
-        return JsonResponse({"error": "Cannot like your own group"}, status=400)
+    if their_group and my_group and their_group != my_group:
+        Profile.objects.filter(group=their_group).update(group=my_group)
+        their_group.delete()
 
-    # Record the like (ignore if already exists)
-    GroupLike.objects.get_or_create(liker=my_group, liked=target_group)
-    
-    # Check for mutual like
-    is_match = GroupLike.objects.filter(liker=target_group, liked=my_group).exists()
-    
-    conversation_id = None
-    if is_match:
-        # It's a match! Create Firebase conversation with all members of both groups
-        my_member_uids = [str(p.user.pk) for p in my_group.members.all()]
-        target_member_uids = [str(p.user.pk) for p in target_group.members.all()]
-        all_uids = sorted(list(set(my_member_uids + target_member_uids)))
-        
-        is_direct = len(all_uids) == 2
-        convo_type = "direct" if is_direct else "group"
-        convo_id = "_".join(all_uids) if is_direct else None
-        
-        user_objs = User.objects.filter(pk__in=[int(u) for u in all_uids])
-        participant_names = {
-            str(u.pk): f"{u.first_name} {u.last_name}".strip() or u.username
-            for u in user_objs
-        }
+    # Build participant list from the merged group
+    members = Profile.objects.filter(group=my_group).select_related('user')
+    all_uids = [str(m.user.pk) for m in members]
+    participant_names = {
+        str(m.user.pk): f"{m.user.first_name} {m.user.last_name}".strip() or m.user.username
+        for m in members
+    }
 
-        db = firestore.client()
-        convos_ref = db.collection("conversations")
+    # Create or update the group chat in Firestore
+    db = firestore.client()
+    convo_ref = db.collection("conversations").document(f"group_{my_group.id}")
+    doc = convo_ref.get()
+    if doc.exists:
+        convo_ref.update({
+            "participants": all_uids,
+            "participantNames": participant_names,
+        })
+    else:
+        convo_ref.set({
+            "participants": all_uids,
+            "participantNames": participant_names,
+            "type": "group",
+            "createdAt": firestore.SERVER_TIMESTAMP,
+            "lastMessage": None,
+        })
 
-        if convo_id:
-            doc_ref = convos_ref.document(convo_id)
-            doc = doc_ref.get()
-            if not doc.exists:
-                doc_ref.set({
-                    "participants": all_uids,
-                    "participantNames": participant_names,
-                    "type": convo_type,
-                    "createdAt": firestore.SERVER_TIMESTAMP,
-                    "lastMessage": None,
-                })
-        else:
-            doc_ref = convos_ref.add({
-                "participants": all_uids,
-                "participantNames": participant_names,
-                "type": convo_type,
-                "createdAt": firestore.SERVER_TIMESTAMP,
-                "lastMessage": None,
-                "name": f"Match: {my_group.name} & {target_group.name}"
-            })[1]
-            convo_id = doc_ref.id
-            
-        conversation_id = convo_id
+    return JsonResponse({"message": "Match accepted!"})
 
-    return JsonResponse({
-        "success": True, 
-        "is_match": is_match, 
-        "conversation_id": conversation_id
-    })
+
+@csrf_exempt
+def decline_match_request(request, user_id):
+    """Declines and removes a match request."""
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Not authenticated"}, status=401)
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    sender = get_object_or_404(User, pk=user_id)
+    request.user.profile.incoming_requests.remove(sender.profile)
+    return JsonResponse({"message": "Request declined"})

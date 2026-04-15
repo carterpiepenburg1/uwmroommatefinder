@@ -41,11 +41,15 @@ function ChatWindow({ conversation }) {
         );
     }
 
-    // Resolve display name for the header
+    // 1-on-1: show the other person's name. Group (3+): list all members except self
+    const isGroup = (conversation.participants?.length ?? 0) > 2;
     const otherUid = conversation.participants?.find((p) => p !== firebaseUid);
-    const headerName =
-        conversation.participantNames?.[otherUid] ??
-        (conversation.type === "group" ? conversation.name ?? "Group Chat" : "Chat");
+    const headerName = isGroup
+        ? Object.entries(conversation.participantNames ?? {})
+            .filter(([uid]) => uid !== firebaseUid)
+            .map(([, name]) => name)
+            .join(", ")
+        : conversation.participantNames?.[otherUid] ?? "Chat";
 
     return (
         <div className="chat-window">

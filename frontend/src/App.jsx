@@ -5,6 +5,7 @@ import Profile from "./pages/Profile";
 import Matches from "./pages/Matches";
 import Chat from "./pages/Chat";
 import Notifications from "./pages/Notifications";
+import Checklist from "./pages/Checklist";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ChatProvider } from "./context/ChatContext";
@@ -60,6 +61,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Notifications />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/checklist"
+              element={
+                <ProtectedRoute>
+                  <Checklist />
                 </ProtectedRoute>
               }
             />

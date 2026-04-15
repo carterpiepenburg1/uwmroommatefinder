@@ -71,14 +71,21 @@ ROOT_URLCONF = 'uwmroommatefinder.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        # Include our custom admin templates directory alongside app templates
+        'DIRS': [BASE_DIR / 'base' / 'templates'],
+        'APP_DIRS': False,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'microsoft_auth.context_processors.microsoft',
+            ],
+            'loaders': [
+                # First check DIRS (our custom templates)
+                'django.template.loaders.filesystem.Loader',
+                # Then fall back to each app's templates/ folder
+                'django.template.loaders.app_directories.Loader',
             ],
         },
     },
