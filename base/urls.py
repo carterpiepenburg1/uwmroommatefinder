@@ -13,4 +13,8 @@ urlpatterns = [
     path('api/profile/active/', views.toggle_active, name='toggle_active'),
     path('api/programs/', views.get_programs, name='get_programs'),
     path('api/matches/potential/', views.get_potential_matches, name='get_potential_matches'),
+    path('api/notifications/', views.get_notifications, name='get_notifications'),
+    path('api/match/request/<int:user_id>/', views.send_match_request, name='send_match_request'),
+    path('api/match/accept/<int:user_id>/', views.accept_match_request, name='accept_match_request'),
+    path('api/match/decline/<int:user_id>/', views.decline_match_request, name='decline_match_request'),
 ]

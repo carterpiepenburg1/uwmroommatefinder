@@ -4,27 +4,9 @@ import "../styles/Matches.css";
 
 const PAGE_SIZE = 10;
 
-const EXAMPLE_USER = {
-  id: "example",
-  name: "Alex Johnson",
-  programs: ["Computer Science"],
-  gender: "Male",
-  standing: "Sophomore",
-  dorm_building: "Sandburg (N/S/W)",
-  room_type: "Double",
-  term: "Fall",
-  compatibility_score: 85,
-  noise_level_display: "Moderate",       noise_level_priority: false,
-  cleanliness_display: "Very Clean",     cleanliness_priority: true,
-  sleep_habits_display: "Night Owl",     sleep_habits_priority: false,
-  social_level_display: "Ambivert",      social_level_priority: false,
-  guest_policy_display: "Occasionally",  guest_policy_priority: false,
-  alcohol_policy_display: "Strictly Dry", alcohol_policy_priority: true,
-  shared_belongings_display: "Ask First", shared_belongings_priority: false,
-};
-
 function Matches() {
   const [matches, setMatches] = useState([]);
+  const [pendingIds, setPendingIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
@@ -36,17 +18,33 @@ function Matches() {
         if (!res.ok) throw new Error("Failed to load matches");
         return res.json();
       })
-      .then(data => setMatches(data.matches || []))
+      .then(data => {
+        setMatches(data.matches || []);
+        setPendingIds(new Set(data.pending_request_ids || []));
+      })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
+  const handleMatchRequest = (userId) => {
+    setPendingIds(prev => new Set([...prev, userId]));
+    fetch(`http://localhost:8000/api/match/request/${userId}/`, {
+      method: "POST",
+      credentials: "include",
+    }).catch(() => {
+      // revert optimistic update on failure
+      setPendingIds(prev => {
+        const next = new Set(prev);
+        next.delete(userId);
+        return next;
+      });
+    });
+  };
+
   if (loading) return <div style={{ padding: "2rem", color: "white" }}>Loading matches...</div>;
   if (error) return <div style={{ padding: "2rem", color: "red" }}>Error: {error}</div>;
 
-  // TEMP: prepend example user for display testing — revert when removing EXAMPLE_USER
-  const allMatches = [EXAMPLE_USER, ...matches];
-  // const allMatches = matches;
+  const allMatches = matches;
   const totalPages = Math.ceil(allMatches.length / PAGE_SIZE);
   const pageMatches = allMatches.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
@@ -67,7 +65,13 @@ function Matches() {
               <div key={match.id}>
                 <MatchCard match={match} />
                 <div className="match-card-actions">
-                  <button className="match-btn match-btn-accept">Match</button>
+                  <button
+                    className={`match-btn ${pendingIds.has(match.id) ? "match-btn-pending" : "match-btn-accept"}`}
+                    onClick={() => handleMatchRequest(match.id)}
+                    disabled={pendingIds.has(match.id)}
+                  >
+                    {pendingIds.has(match.id) ? "Pending" : "Match"}
+                  </button>
                   <button className="match-btn match-btn-deny">Skip</button>
                 </div>
               </div>

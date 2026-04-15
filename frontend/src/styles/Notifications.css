@@ -42,45 +42,28 @@
 
 .notification-card {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   background: #1e1e1e;
   border: 1px solid #2e2e2e;
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-  gap: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .notification-card.resolved {
   opacity: 0.6;
 }
 
-.notification-info {
+.notification-footer {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.notification-sender {
-  font-weight: bold;
-  font-size: 1rem;
-  color: white;
-}
-
-.notification-meta {
-  font-size: 0.85rem;
-  color: #aaa;
-}
-
-.notification-time {
-  font-size: 0.75rem;
-  color: #666;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #2e2e2e;
 }
 
 .notification-actions {
   display: flex;
   gap: 0.5rem;
-  flex-shrink: 0;
 }
 
 .btn-accept {
