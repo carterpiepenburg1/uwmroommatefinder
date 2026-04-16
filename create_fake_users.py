@@ -153,9 +153,7 @@ def create_fake_users():
 
     # Send a few test match requests to the dev account
     try:
-
-        me = User.objects.get(email='piepen22@uwm.edu')
-
+        me = User.objects.get(email='admeder@uwm.edu')
         senders = ['sarahj', 'ethanm', 'mayap']
         for username in senders:
             try:

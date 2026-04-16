@@ -16,9 +16,15 @@ function Layout() {
       case "/profile":
         return "Profile";
       case "/matches":
-        return "Matches";
+        return "Explore and Connect";
       case "/chat":
         return "Chat";
+      case "/notifications":
+        return "Notifications";
+      case "/checklist":
+        return "Checklist";
+      case "/group":
+        return "Your Group";
       default:
         return "";
     }

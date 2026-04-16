@@ -19,5 +19,32 @@ services:
       timeout: 5s
       retries: 5
 
+  django:
+    build: .
+    container_name: uwm_roommate_django
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  react:
+    build: ./frontend
+    container_name: uwm_roommate_react
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - django
+
 volumes:
   postgres_data:
