@@ -30,6 +30,9 @@ function Sidebar() {
             <Link to="/checklist">Checklist</Link>
           </li>
           <li>
+            <Link to="/group">Your Group</Link>
+          </li>
+          <li>
             <Link to="/matches">Explore and Connect</Link>
           </li>
           <li>
