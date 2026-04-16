@@ -458,3 +458,69 @@ def decline_match_request(request, user_id):
     sender = get_object_or_404(User, pk=user_id)
     request.user.profile.incoming_requests.remove(sender.profile)
     return JsonResponse({"message": "Request declined"})
+
+
+def get_group(request):
+    """
+    Returns the current user's group and all its members.
+    Used by the Your Group page to display who you are matched with.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Not authenticated"}, status=401)
+
+    profile = request.user.profile
+    group = profile.group
+
+    if not group:
+        return JsonResponse({"group": None})
+
+    program_dict = dict(Program.choices)
+    members = []
+    for member_profile in group.members.all():
+        u = member_profile.user
+        members.append({
+            "id": u.pk,
+            "name": f"{u.first_name} {u.last_name}".strip() or u.username,
+            "programs": [program_dict.get(p, p) for p in member_profile.programs],
+            "standing": member_profile.get_standing_display(),
+            "dorm_building": member_profile.get_dorm_building_display(),
+            "room_type": member_profile.get_room_type_display(),
+            "gender": member_profile.get_gender_display(),
+            "is_current_user": u.pk == request.user.pk,
+        })
+
+    return JsonResponse({
+        "group": {
+            "id": group.id,
+            "name": group.name,
+            "members": members,
+        }
+    })
+
+
+@csrf_exempt
+def leave_group(request):
+    """
+    Removes the current user from their group and puts them in a new solo group.
+    Deletes the old group if it becomes empty.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Not authenticated"}, status=401)
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    profile = request.user.profile
+    old_group = profile.group
+
+    if not old_group or old_group.members.count() <= 1:
+        return JsonResponse({"error": "You are not in a group"}, status=400)
+
+    from .models import Group
+    new_group = Group.objects.create(name=f"{request.user.username}'s Group")
+    profile.group = new_group
+    profile.save()
+
+    if not old_group.members.exists():
+        old_group.delete()
+
+    return JsonResponse({"success": True})
