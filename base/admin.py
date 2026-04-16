@@ -249,7 +249,7 @@ class ProfileAdmin(admin.ModelAdmin):
         "user__first_name", "user__last_name",
     )
     ordering      = ("user__username",)
-    readonly_fields = ("user",)
+    readonly_fields = ("user", "formatted_checklist")
 
     fieldsets = (
         ("Identity",    {"fields": ("user", "gender", "standing", "term")}),
@@ -266,7 +266,19 @@ class ProfileAdmin(admin.ModelAdmin):
         )}),
         ("Status",  {"fields": ("is_profile_complete", "is_active", "group")}),
         ("Roommate Requests", {"fields": ("incoming_requests",)}),
+        ("Checklist", {"fields": ("formatted_checklist",),}),
     )
+
+    def formatted_checklist(self, obj):
+        if not obj.checklist:
+            return "No items"
+
+        return "\n".join(
+            f"{'[x]' if item.get('checked') else '[ ]'} {item.get('text', '')}"
+            for item in obj.checklist
+        )
+
+    formatted_checklist.short_description = "Checklist"
 
 
 # ---------------------------------------------------------------------------

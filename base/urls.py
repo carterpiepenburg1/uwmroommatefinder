@@ -17,6 +17,7 @@ urlpatterns = [
     path('api/match/request/<int:user_id>/', views.send_match_request, name='send_match_request'),
     path('api/match/accept/<int:user_id>/', views.accept_match_request, name='accept_match_request'),
     path('api/match/decline/<int:user_id>/', views.decline_match_request, name='decline_match_request'),
+    path('api/checklist/', views.checklist, name='checklist'),
     path('api/group/', views.get_group, name='get_group'),
     path('api/group/leave/', views.leave_group, name='leave_group'),
 ]

@@ -459,6 +459,29 @@ def decline_match_request(request, user_id):
     request.user.profile.incoming_requests.remove(sender.profile)
     return JsonResponse({"message": "Request declined"})
 
+#Checklist stuff
+@csrf_exempt
+def checklist(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Not authenticated"}, status=401)
+
+    profile = request.user.profile
+
+    #GET (load checklist from profile)
+    if request.method == "GET":
+        return JsonResponse({"checklist": profile.checklist})
+
+    #POST (save checklist to profile)
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            profile.checklist = data
+            profile.save()
+            return JsonResponse({"message": "Checklist saved"})
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 def get_group(request):
     """
