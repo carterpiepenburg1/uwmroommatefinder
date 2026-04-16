@@ -383,6 +383,9 @@ class Profile(models.Model):
     #Roommate Requests (works both ways because of related name "outgoing_requests")
     incoming_requests = models.ManyToManyField('self', symmetrical=False, related_name='outgoing_requests', blank=True)
 
+    #Checklist items
+    checklist = models.JSONField(default=list, blank=True)
+
     def __str__(self):
         return self.user.username
 
