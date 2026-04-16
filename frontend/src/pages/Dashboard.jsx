@@ -9,6 +9,9 @@ import tutorial_4 from "../assets/tutorial_4.png";
 import tutorial_5 from "../assets/tutorial_5.png";
 import tutorial_6 from "../assets/tutorial_6.png";
 import tutorial_7 from "../assets/tutorial_7.png";
+import tutorial_8 from "../assets/tutorial_8.png";
+import tutorial_9 from "../assets/tutorial_9.png";
+import tutorial_10 from "../assets/tutorial_10.png";
 import { Link } from 'react-router-dom';
 import '../styles/Dashboard.css';
 
@@ -138,6 +141,17 @@ const Dashboard = () => {
               to the checklist and check them off as you get them. It's a great way to make sure you don't forget anything important!
             </p>
             <img style={{ marginBottom: '50px' }} src={tutorial_7} alt="Checklist" />
+            <p>
+              Under the Groups tab, you can see the other people that you have matched with. These are the people that you will (hopefully) be living with, so it's a good idea 
+              to check out their profiles and get to know them before move-in day. You can also chat with them in the Chat tab.
+            </p>
+            <img src={tutorial_8} alt="Groups" />
+            <img style={{ marginBottom: '50px' }} src={tutorial_9} alt="Groups 2" />
+            <p>
+              If you end up deciding that you don't want to be in a group anymore, you can click the "Leave Group" button in the Group tab. 
+              This will remove you from the group and allow you to explore other matches.
+            </p>
+            <img style={{ marginBottom: '50px' }} src={tutorial_10} alt="Leave Group" />
         </div>
       </div>
   );
