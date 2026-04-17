@@ -27,19 +27,19 @@ function Sidebar() {
             <Link to="/profile">Profile</Link>
           </li>
           <li>
-            <Link to="/checklist">Checklist</Link>
+            <Link to="/matches">Explore and Connect</Link>
+          </li>
+          <li>
+            <Link to="/notifications">Notifications</Link>
           </li>
           <li>
             <Link to="/group">Your Group</Link>
           </li>
           <li>
-            <Link to="/matches">Explore and Connect</Link>
-          </li>
-          <li>
             <Link to="/chat">Chat</Link>
           </li>
           <li>
-            <Link to="/notifications">Notifications</Link>
+            <Link to="/checklist">Checklist</Link>
           </li>
           <li>
             <button onClick={handleLogout} className="logout-button">

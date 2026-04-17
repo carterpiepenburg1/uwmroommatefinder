@@ -41,8 +41,7 @@ function Group() {
 
   return (
     <div className="group-page">
-      <h1 className="group-title">Your Group</h1>
-
+      <p className="group-subtitle">See who you've matched with and manage your group.</p>
       {isSolo ? (
         <div className="group-empty">
           <p>You haven't matched with anyone yet.</p>
@@ -81,9 +80,31 @@ function Group() {
 
           <section className="group-section">
             <h2 className="group-section-title">Shared Checklist</h2>
-            <div className="group-checklist-placeholder">
-              <p>Coming soon — your group's shared checklist will appear here.</p>
-            </div>
+            {group.members.every(m => (m.checklist || []).length === 0) ? (
+              <div className="group-checklist-placeholder">
+                <p>No checklist items yet. Add items in your Checklist page.</p>
+              </div>
+            ) : (
+              <div className="group-checklist">
+                {group.members.map(member => (
+                  (member.checklist || []).length > 0 && (
+                    <div key={member.id} className="group-checklist-person">
+                      <h3 className="group-checklist-person-name">
+                        {member.name}{member.is_current_user ? " (You)" : ""}
+                      </h3>
+                      <ul className="group-checklist-items">
+                        {member.checklist.map(item => (
+                          <li key={item.id} className={`group-checklist-item ${item.checked ? "checked" : ""}`}>
+                            <span className="group-checklist-check">{item.checked ? "✓" : "○"}</span>
+                            <span className="group-checklist-text">{item.text}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )
+                ))}
+              </div>
+            )}
           </section>
 
           <button className="group-leave-btn" onClick={handleLeave}>

@@ -6,14 +6,23 @@ function Checklist() {
   const [input, setInput] = useState("");
 
   useEffect(() => {
-    document.title = "Checklist | Roommate Finder";
+  document.title = "Checklist | Roommate Finder";
 
-    //Loads checklist from local (CHANGE TO GET FROM DATABASE)
-    const saved = localStorage.getItem("checklist");
-    if (saved) {
-      setItems(JSON.parse(saved));
+  const fetchChecklist = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/api/checklist/", {
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      setItems(data.checklist || []);
+    } catch (err) {
+      console.error("Error loading checklist:", err);
     }
-  }, []);
+  };
+
+  fetchChecklist();
+}, []);
 
   //Adding items
   const addItem = () => {
@@ -43,15 +52,30 @@ function Checklist() {
     );
   };
 
-  //Saving checklist (CHANGE THIS TO DATABASE LATER ALSO PLEASE)
-  const saveChecklist = () => {
-    localStorage.setItem("checklist", JSON.stringify(items));
-    alert("Checklist saved");
-  };
+  //Saving checklist
+  const saveChecklist = async () => {
+  try {
+    const res = await fetch("http://localhost:8000/api/checklist/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(items),
+    });
+
+    if (res.ok) {
+      alert("Checklist saved!");
+    } else {
+      alert("Failed to save checklist");
+    }
+  } catch (err) {
+    console.error("Error saving checklist:", err);
+  }
+};
 
   return (
     <div className="checklist-page">
-      <h1 className="checklist-title">Checklist</h1>
       <p className="checklist-subtitle">
         Track needed items for your move.
       </p>
@@ -62,9 +86,14 @@ function Checklist() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              addItem();
+            }
+          }}
           placeholder="Add an item..."
         />
-        <button onClick={addItem}>Add</button>
+        <button onClick={addItem} className="btn-primary">Add</button>
       </div>
 
       {/* Show list */}
@@ -81,13 +110,13 @@ function Checklist() {
               {item.text}
             </span>
 
-            <button onClick={() => deleteItem(item.id)}>Delete</button>
+            <button onClick={() => deleteItem(item.id)} className="btn-secondary">Delete</button>
           </li>
         ))}
       </ul>
 
       {/* Save button*/}
-      <button className="save-btn" onClick={saveChecklist}>
+      <button onClick={saveChecklist} className="btn-primary save-btn">
         Save
       </button>
     </div>

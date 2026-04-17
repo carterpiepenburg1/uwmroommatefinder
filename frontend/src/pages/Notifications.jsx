@@ -37,7 +37,6 @@ function Notifications() {
 
   return (
     <div className="notifications-page">
-      <h1 className="notifications-title">Notifications</h1>
       <p className="notifications-subtitle">Match requests from other students.</p>
 
       {pending.length === 0 && resolved.length === 0 && (
