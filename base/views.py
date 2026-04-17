@@ -4,6 +4,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, get_object_or_404
+from django.db.models import Q
 import firebase_admin
 import firebase_admin.auth as fb_auth
 from firebase_admin import firestore
@@ -359,7 +360,7 @@ def get_potential_matches(request):
 
     pending_ids = list(my_profile.outgoing_requests.values_list('user__pk', flat=True))
 
-    return JsonResponse({"matches": matches, "pending_request_ids": pending_ids})
+    return JsonResponse({"matches": matches, "pending_request_ids": pending_ids, "my_dorm": my_profile.dorm_building or ""})
 
 
 def get_notifications(request):
@@ -519,6 +520,88 @@ def get_group(request):
             "members": members,
         }
     })
+
+
+def get_filtered_matches(request):
+    """
+    GET /api/matches/filtered/?dorm=C&term=F&standing=FR&room_type=D&noise_level=0&...
+    Returns active, gender-compatible users not in the current user's group,
+    filtered by any provided params, ordered by compatibility.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Not authenticated"}, status=401)
+
+    my_profile = request.user.profile
+    candidates = Profile.objects.filter(is_active=True).exclude(user=request.user).select_related('user')
+
+    if my_profile.group:
+        candidates = candidates.exclude(group=my_profile.group)
+
+    if my_profile.gender == 'M':
+        candidates = candidates.filter(gender__in=['M', 'O'])
+    elif my_profile.gender == 'F':
+        candidates = candidates.filter(gender__in=['F', 'O'])
+
+    # Optional filters from query params
+    for param, field in [
+        ('dorm', 'dorm_building'),
+        ('term', 'term'),
+        ('room_type', 'room_type'),
+        ('standing', 'standing'),
+    ]:
+        val = request.GET.get(param, '').strip()
+        if val:
+            candidates = candidates.filter(**{field: val})
+
+    for pref in PREF_FIELDS:
+        val = request.GET.get(pref, '').strip()
+        if val != '':
+            candidates = candidates.filter(**{pref: int(val)})
+
+    program_dict = dict(Program.choices)
+    results = [_serialize_match(my_profile, p, program_dict) for p in candidates]
+    results.sort(key=lambda m: m["compatibility_score"], reverse=True)
+
+    pending_ids = list(my_profile.outgoing_requests.values_list('user__pk', flat=True))
+    return JsonResponse({"results": results, "pending_request_ids": pending_ids})
+
+
+def search_users(request):
+    """
+    GET /api/search/?q=<query>
+    Returns users whose name contains the query (min 3 chars).
+    Filters: active, not in same group, gender-compatible.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Not authenticated"}, status=401)
+
+    q = request.GET.get("q", "").strip()
+    if len(q) < 3:
+        return JsonResponse({"results": [], "pending_request_ids": []})
+
+    my_profile = request.user.profile
+
+    candidates = Profile.objects.filter(is_active=True).exclude(user=request.user).select_related('user')
+
+    if my_profile.group:
+        candidates = candidates.exclude(group=my_profile.group)
+
+    if my_profile.gender == 'M':
+        candidates = candidates.filter(gender__in=['M', 'O'])
+    elif my_profile.gender == 'F':
+        candidates = candidates.filter(gender__in=['F', 'O'])
+
+    candidates = candidates.filter(
+        Q(user__first_name__icontains=q) | Q(user__last_name__icontains=q)
+    )
+
+    program_dict = dict(Program.choices)
+    results = [_serialize_match(my_profile, p, program_dict) for p in candidates]
+    results.sort(key=lambda m: m["compatibility_score"], reverse=True)
+
+    pending_ids = list(my_profile.outgoing_requests.values_list('user__pk', flat=True))
+
+    return JsonResponse({"results": results, "pending_request_ids": pending_ids})
 
 
 @csrf_exempt

@@ -20,4 +20,6 @@ urlpatterns = [
     path('api/checklist/', views.checklist, name='checklist'),
     path('api/group/', views.get_group, name='get_group'),
     path('api/group/leave/', views.leave_group, name='leave_group'),
+    path('api/search/', views.search_users, name='search_users'),
+    path('api/matches/filtered/', views.get_filtered_matches, name='get_filtered_matches'),
 ]
