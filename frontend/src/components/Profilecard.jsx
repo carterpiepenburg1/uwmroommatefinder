@@ -6,6 +6,9 @@ export default function ProfileCard({ user }) {
   return (
     <div className="profile-container">
       <div className="profile-card">
+        <p style={{ color: "#aaa", fontSize: "0.8rem", textAlign: "center", marginBottom: "0.75rem" }}>
+          This is how your profile appears to other students.
+        </p>
         <h2 className="profile-name">{user.name}</h2>
 
         <div className="profile-section">

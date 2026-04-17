@@ -76,7 +76,6 @@ function Checklist() {
 
   return (
     <div className="checklist-page">
-      <h1 className="checklist-title">Checklist</h1>
       <p className="checklist-subtitle">
         Track needed items for your move.
       </p>

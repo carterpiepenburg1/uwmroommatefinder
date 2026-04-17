@@ -72,13 +72,8 @@ const Dashboard = () => {
         {/* Navigation grid for different parts of the app */}
           <div className="dashboard-grid">
               <Link to="/Profile" className="dashboard-card">
-                  <h3> Profile</h3>
+                  <h3>Profile</h3>
                   <p>Edit profile details and adjust preferences</p>
-              </Link>
-
-              <Link to="/Checklist" className="dashboard-card">
-                  <h3>Checklist</h3>
-                  <p>Adjust your checklist for when you move in</p>
               </Link>
 
               <Link to="/Matches" className="dashboard-card">
@@ -86,14 +81,24 @@ const Dashboard = () => {
                   <p>Connect and reach out to other students</p>
               </Link>
 
+              <Link to="/Notifications" className="dashboard-card">
+                  <h3>Notifications</h3>
+                  <p>Notifications for matches, chats, and more</p>
+              </Link>
+
+              <Link to="/group" className="dashboard-card">
+                  <h3>Your Group</h3>
+                  <p>See the people you've matched with</p>
+              </Link>
+
               <Link to="/Chat" className="dashboard-card">
                   <h3>Chat</h3>
                   <p>Checkout your chats with other students</p>
               </Link>
 
-              <Link to="/Notifications" className="dashboard-card">
-                  <h3>Notifications</h3>
-                  <p>Notifications for matches, chats, and more</p>
+              <Link to="/Checklist" className="dashboard-card">
+                  <h3>Checklist</h3>
+                  <p>Adjust your checklist for when you move in</p>
               </Link>
           </div>
         <div style={{ color: "white", padding: "20px"}}>
