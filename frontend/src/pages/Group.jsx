@@ -41,8 +41,7 @@ function Group() {
 
   return (
     <div className="group-page">
-      <h1 className="group-title">Your Group</h1>
-
+      <p className="group-subtitle">See who you've matched with and manage your group.</p>
       {isSolo ? (
         <div className="group-empty">
           <p>You haven't matched with anyone yet.</p>

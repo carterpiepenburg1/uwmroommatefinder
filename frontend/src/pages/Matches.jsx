@@ -50,7 +50,6 @@ function Matches() {
 
   return (
     <div className="matches-page">
-      <h1 className="matches-title">Explore and Connect</h1>
       <p className="matches-subtitle">Showing your top matches based on compatibility.</p>
 
       {allMatches.length === 0 ? (

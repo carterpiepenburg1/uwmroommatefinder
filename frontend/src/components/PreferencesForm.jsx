@@ -69,7 +69,7 @@ const PreferencesForm = ({ user, onComplete }) => {
             <div key={key}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                 <label>
-                  {label}
+                  {label} <span style={{ color: 'red' }}>*</span>
                   <FieldHint text={hint} />
                 </label>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#FFBD00', cursor: 'pointer' }}>

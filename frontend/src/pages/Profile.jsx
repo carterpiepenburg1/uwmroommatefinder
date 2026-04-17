@@ -46,6 +46,9 @@ function Profile() {
 
   return (
     <div>
+      <p style={{ color: "#aaa", marginBottom: "1rem", paddingLeft: "1rem" }}>
+        Update your profile info and housing preferences.
+      </p>
       <ProfileCard user={user} />
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', margin: '20px auto 0', maxWidth: '600px' }}>

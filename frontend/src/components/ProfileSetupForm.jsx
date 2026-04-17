@@ -95,7 +95,7 @@ const ProfileSetupForm = ({ user, onComplete }) => {
           {/* GENDER */}
           <div>
             <label>
-              Gender Identity
+              Gender Identity <span style={{ color: 'red' }}>*</span>
               <FieldHint text="This helps us suggest compatible roommates." />
             </label>
             <select name="gender" value={formData.gender} onChange={handleChange} required style={dropdownStyle}>
@@ -109,7 +109,7 @@ const ProfileSetupForm = ({ user, onComplete }) => {
           {/* STANDING */}
           <div>
             <label>
-              Class Standing
+              Class Standing <span style={{ color: 'red' }}>*</span>
               <FieldHint text="Your academic year at UWM." position="right" />
             </label>
             <select name="standing" value={formData.standing} onChange={handleChange} required style={dropdownStyle}>
@@ -124,7 +124,7 @@ const ProfileSetupForm = ({ user, onComplete }) => {
           {/* Primary Major */}
           <div>
             <label>
-              Primary Major / Program
+              Primary Major / Program <span style={{ color: 'red' }}>*</span>
               <FieldHint text="Select your declared (or intended) major." />
             </label>
             <select 
@@ -146,7 +146,7 @@ const ProfileSetupForm = ({ user, onComplete }) => {
           {/* DORM BUILDING */}
           <div>
             <label>
-              Preferred Dorm
+              Preferred Dorm <span style={{ color: 'red' }}>*</span>
               <FieldHint text="Select where you plan to live this coming semester." />
             </label>
             <select name="dorm_building" value={formData.dorm_building} onChange={handleChange} required style={dropdownStyle}>
@@ -161,7 +161,7 @@ const ProfileSetupForm = ({ user, onComplete }) => {
           {/* ROOM TYPE */}
           <div>
             <label>
-              Room Type
+              Room Type <span style={{ color: 'red' }}>*</span>
               <FieldHint text="Select your desired room time for this coming semester." />
             </label>
             <select name="room_type" value={formData.room_type} onChange={handleChange} required style={dropdownStyle}>
@@ -175,7 +175,7 @@ const ProfileSetupForm = ({ user, onComplete }) => {
           {/* TERM */}
           <div>
             <label>
-              Term
+              Term <span style={{ color: 'red' }}>*</span>
               <FieldHint text="The semester you'll be moving in. Only users on the same term will be shown as potential matches." position="right" />
             </label>
             <select name="term" value={formData.term} onChange={handleChange} required style={dropdownStyle}>

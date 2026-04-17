@@ -31,29 +31,34 @@
 }
 
 .topbar {
-  height: 70px;
+  height: 60px;
   display: flex;
   align-items: center;
   padding: 0 30px;
   background-color: #FFBD00;
   justify-content: center;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
 }
 
 .menu-toggle {
     background: transparent;
-  color: #000; /* Black text to contrast the gold */
+  color: #000;
   border: none;
   font-size: 1.5rem;
   font-weight: bold;
   cursor: pointer;
-  position: absolute; /* Keeps your dashboard title perfectly centered */
+  position: absolute;
   left: 30px;
 }
 
 .main-content {
   flex: 1;
   padding: 30px;
+  padding-top: calc(30px + 60px);
   background-color: #333333;
 }
 
