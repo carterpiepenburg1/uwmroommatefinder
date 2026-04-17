@@ -511,6 +511,7 @@ def get_group(request):
             "room_type": member_profile.get_room_type_display(),
             "gender": member_profile.get_gender_display(),
             "is_current_user": u.pk == request.user.pk,
+            "checklist": member_profile.checklist or [],
         })
 
     return JsonResponse({

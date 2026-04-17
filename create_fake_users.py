@@ -151,6 +151,91 @@ def create_fake_users():
 
     print(f"\nDone — {created} created, {skipped} skipped.")
 
+    # Patch the 5 Riverview Spring male users so they appear in the dev account's Explore & Connect
+    riverview_spring_males = ['quincya', 'peytong', 'reedm', 'blakec', 'finnob']
+    for username in riverview_spring_males:
+        try:
+            u = User.objects.get(username=username)
+            u.profile.term = Term.spring
+            u.profile.dorm_building = DormBuilding.riverview
+            u.profile.gender = Gender.MALE
+            u.profile.save()
+            print(f"  patched {username} -> Spring / Riverview / Male")
+        except User.DoesNotExist:
+            pass
+
+    # Add checklists to the users who send match requests (they'll appear in Your Group)
+    CHECKLISTS = {
+        'sarahj': [
+            {"id": 1, "text": "Bedding & pillow", "checked": True},
+            {"id": 2, "text": "Shower caddy & flip flops", "checked": True},
+            {"id": 3, "text": "Desk lamp", "checked": False},
+            {"id": 4, "text": "Power strip", "checked": True},
+            {"id": 5, "text": "Laundry basket & detergent", "checked": False},
+            {"id": 6, "text": "Mini fridge", "checked": False},
+        ],
+        'ethanm': [
+            {"id": 1, "text": "Bedding set (twin XL)", "checked": True},
+            {"id": 2, "text": "Laptop & charger", "checked": True},
+            {"id": 3, "text": "Shower supplies", "checked": True},
+            {"id": 4, "text": "Hangers", "checked": False},
+            {"id": 5, "text": "Fan", "checked": False},
+            {"id": 6, "text": "Headphones", "checked": True},
+            {"id": 7, "text": "First aid kit", "checked": False},
+        ],
+        'mayap': [
+            {"id": 1, "text": "Towels (2)", "checked": True},
+            {"id": 2, "text": "Bed risers", "checked": False},
+            {"id": 3, "text": "Command strips", "checked": True},
+            {"id": 4, "text": "Reusable water bottle", "checked": True},
+            {"id": 5, "text": "School supplies", "checked": True},
+            {"id": 6, "text": "Ethernet cable", "checked": False},
+        ],
+        # Also give checklists to the Riverview users visible in Explore & Connect
+        'quincya': [
+            {"id": 1, "text": "Bedding (twin XL)", "checked": True},
+            {"id": 2, "text": "Microwave", "checked": False},
+            {"id": 3, "text": "Shower caddy", "checked": True},
+            {"id": 4, "text": "Storage bins", "checked": False},
+        ],
+        'peytong': [
+            {"id": 1, "text": "Pillow & blanket", "checked": True},
+            {"id": 2, "text": "Desk lamp", "checked": True},
+            {"id": 3, "text": "Power strip (surge protected)", "checked": True},
+            {"id": 4, "text": "Mini fridge", "checked": False},
+            {"id": 5, "text": "Hangers", "checked": False},
+        ],
+        'reedm': [
+            {"id": 1, "text": "Twin XL sheets", "checked": True},
+            {"id": 2, "text": "Toiletries", "checked": True},
+            {"id": 3, "text": "Laundry supplies", "checked": False},
+            {"id": 4, "text": "Fan", "checked": False},
+        ],
+        'blakec': [
+            {"id": 1, "text": "Bedding", "checked": True},
+            {"id": 2, "text": "Laptop stand", "checked": True},
+            {"id": 3, "text": "Shower shoes", "checked": True},
+            {"id": 4, "text": "Command hooks", "checked": False},
+            {"id": 5, "text": "Surge protector", "checked": False},
+        ],
+        'finnob': [
+            {"id": 1, "text": "Mattress topper", "checked": False},
+            {"id": 2, "text": "Towels", "checked": True},
+            {"id": 3, "text": "Study lamp", "checked": True},
+            {"id": 4, "text": "Bluetooth speaker", "checked": True},
+            {"id": 5, "text": "Trash can", "checked": False},
+        ],
+    }
+
+    for username, items in CHECKLISTS.items():
+        try:
+            u = User.objects.get(username=username)
+            u.profile.checklist = items
+            u.profile.save()
+            print(f"  checklist set for {username} ({len(items)} items)")
+        except User.DoesNotExist:
+            pass
+
     # Send a few test match requests to the dev account
     try:
         me = User.objects.get(email='admeder@uwm.edu')
@@ -159,11 +244,11 @@ def create_fake_users():
             try:
                 sender = User.objects.get(username=username)
                 me.profile.incoming_requests.add(sender.profile)
-                print(f"  test request: {username} → {me.username}")
+                print(f"  test request: {username} -> {me.username}")
             except User.DoesNotExist:
                 pass
     except User.DoesNotExist:
-        pass  # dev account not in DB, skip silently
+        print("\n  NOTE: Dev account (admeder@uwm.edu) not found — log in first, then re-run.")
 
 
 if __name__ == '__main__':
