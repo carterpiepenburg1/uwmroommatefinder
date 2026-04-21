@@ -236,19 +236,6 @@ def create_fake_users():
         except User.DoesNotExist:
             pass
 
-    # Send a few test match requests to the dev account
-    try:
-        me = User.objects.get(email='admeder@uwm.edu')
-        senders = ['sarahj', 'ethanm', 'mayap']
-        for username in senders:
-            try:
-                sender = User.objects.get(username=username)
-                me.profile.incoming_requests.add(sender.profile)
-                print(f"  test request: {username} -> {me.username}")
-            except User.DoesNotExist:
-                pass
-    except User.DoesNotExist:
-        print("\n  NOTE: Dev account (admeder@uwm.edu) not found — log in first, then re-run.")
 
 
 if __name__ == '__main__':
