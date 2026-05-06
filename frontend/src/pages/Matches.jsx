@@ -31,6 +31,8 @@ function Matches() {
   const [searching, setSearching] = useState(false);
   const debounceRef = useRef(null);
 
+  const [skippingId, setSkippingId] = useState(null);
+
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterValues, setFilterValues] = useState(EMPTY_FILTERS);
   const [filteredMatches, setFilteredMatches] = useState(null);
@@ -123,6 +125,16 @@ function Matches() {
     setPage(0);
   };
 
+  const handleSkip = (userId) => {
+    setSkippingId(userId);
+    setTimeout(() => {
+      setMatches(prev => prev.filter(m => m.id !== userId));
+      setFilteredMatches(prev => prev ? prev.filter(m => m.id !== userId) : prev);
+      setSearchResults(prev => prev.filter(m => m.id !== userId));
+      setSkippingId(null);
+    }, 350);
+  };
+
   const handleMatchRequest = (userId) => {
     setPendingIds(prev => new Set([...prev, userId]));
     fetch(`http://localhost:8000/api/match/request/${userId}/`, {
@@ -161,7 +173,7 @@ function Matches() {
   const renderMatchList = (list) => (
     <div className="matches-list">
       {list.map(match => (
-        <div key={match.id}>
+        <div key={match.id} className={skippingId === match.id ? "match-card-skipping" : ""}>
           <MatchCard match={match} />
           <div className="match-card-actions">
             <button
@@ -171,7 +183,7 @@ function Matches() {
             >
               {pendingIds.has(match.id) ? "Pending" : "Match"}
             </button>
-            <button className="match-btn match-btn-deny">Skip</button>
+            <button className="match-btn match-btn-deny" onClick={() => handleSkip(match.id)}>Skip</button>
           </div>
         </div>
       ))}
