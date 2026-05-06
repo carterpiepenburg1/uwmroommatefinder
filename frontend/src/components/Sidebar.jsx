@@ -1,9 +1,17 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import "../styles/Sidebar.css";
 
 function Sidebar() {
-  
+  const [notifCount, setNotifCount] = useState(0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/notifications/", { credentials: "include" })
+      .then(res => res.json())
+      .then(data => setNotifCount((data.requests || []).length))
+      .catch(() => {});
+  }, []);
 
   const handleLogout = async () => {
     await fetch("http://localhost:8000/api/logout/", {
@@ -30,7 +38,10 @@ function Sidebar() {
             <Link to="/matches">Explore and Connect</Link>
           </li>
           <li>
-            <Link to="/notifications">Notifications</Link>
+            <Link to="/notifications">
+              Notifications
+              {notifCount > 0 && <span className="sidebar-badge">{notifCount}</span>}
+            </Link>
           </li>
           <li>
             <Link to="/group">Your Group</Link>
