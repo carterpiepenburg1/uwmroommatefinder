@@ -659,9 +659,28 @@ def leave_group(request):
         return JsonResponse({"error": "You are not in a group"}, status=400)
 
     from .models import Group
+    old_group_id = old_group.id
+    my_uid = str(request.user.pk)
+
     new_group = Group.objects.create(name=f"{request.user.username}'s Group")
     profile.group = new_group
     profile.save()
+
+    # Update Firestore group chat
+    db = firestore.client()
+    convo_ref = db.collection("conversations").document(f"group_{old_group_id}")
+    doc = convo_ref.get()
+    if doc.exists:
+        remaining = [uid for uid in (doc.to_dict().get("participants") or []) if uid != my_uid]
+        if remaining:
+            # Remove user from participants, keep chat alive for remaining members
+            names = {k: v for k, v in (doc.to_dict().get("participantNames") or {}).items() if k != my_uid}
+            convo_ref.update({"participants": remaining, "participantNames": names})
+        else:
+            # Last person left — wipe the doc and messages
+            for msg in convo_ref.collection("messages").stream():
+                msg.reference.delete()
+            convo_ref.delete()
 
     if not old_group.members.exists():
         old_group.delete()
