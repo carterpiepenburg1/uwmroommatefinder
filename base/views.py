@@ -567,6 +567,42 @@ def get_filtered_matches(request):
     return JsonResponse({"results": results, "pending_request_ids": pending_ids})
 
 
+def reset_chats(request):
+    """
+    Wipes all Firestore conversations and recreates the current user's group chat cleanly.
+    One-time fix for contaminated peer testing data.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Not authenticated"}, status=401)
+
+    db = firestore.client()
+    convos_ref = db.collection("conversations")
+
+    for doc in convos_ref.stream():
+        for msg in doc.reference.collection("messages").stream():
+            msg.reference.delete()
+        doc.reference.delete()
+
+    my_profile = request.user.profile
+    my_group = my_profile.group
+    if my_group and my_group.members.count() > 1:
+        members = Profile.objects.filter(group=my_group).select_related('user')
+        all_uids = [str(m.user.pk) for m in members]
+        participant_names = {
+            str(m.user.pk): f"{m.user.first_name} {m.user.last_name}".strip() or m.user.username
+            for m in members
+        }
+        convos_ref.document(f"group_{my_group.id}").set({
+            "participants": all_uids,
+            "participantNames": participant_names,
+            "type": "group",
+            "createdAt": firestore.SERVER_TIMESTAMP,
+            "lastMessage": None,
+        })
+
+    return JsonResponse({"message": "Chats reset successfully."})
+
+
 def search_users(request):
     """
     GET /api/search/?q=<query>

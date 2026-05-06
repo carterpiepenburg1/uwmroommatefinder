@@ -7,10 +7,16 @@ function Sidebar() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/notifications/", { credentials: "include" })
-      .then(res => res.json())
-      .then(data => setNotifCount((data.requests || []).length))
-      .catch(() => {});
+    const fetchCount = () => {
+      fetch("http://localhost:8000/api/notifications/", { credentials: "include" })
+        .then(res => res.json())
+        .then(data => setNotifCount((data.requests || []).length))
+        .catch(() => {});
+    };
+
+    fetchCount();
+    window.addEventListener("notifications-changed", fetchCount);
+    return () => window.removeEventListener("notifications-changed", fetchCount);
   }, []);
 
   const handleLogout = async () => {
