@@ -20,6 +20,7 @@ function Notifications() {
       credentials: "include",
     });
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status: "accepted" } : r));
+    setTimeout(() => window.dispatchEvent(new Event("notifications-changed")), 300);
   };
 
   const handleDecline = (id) => {
@@ -28,6 +29,7 @@ function Notifications() {
       credentials: "include",
     });
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status: "declined" } : r));
+    setTimeout(() => window.dispatchEvent(new Event("notifications-changed")), 300);
   };
 
   const pending = requests.filter((r) => r.status === "pending");

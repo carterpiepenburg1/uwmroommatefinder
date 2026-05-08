@@ -22,4 +22,5 @@ urlpatterns = [
     path('api/group/leave/', views.leave_group, name='leave_group'),
     path('api/search/', views.search_users, name='search_users'),
     path('api/matches/filtered/', views.get_filtered_matches, name='get_filtered_matches'),
+    path('api/dev/reset-chats/', views.reset_chats, name='reset_chats'),
 ]

@@ -101,62 +101,50 @@ const Dashboard = () => {
                   <p>Adjust your checklist for when you move in</p>
               </Link>
           </div>
-        <div style={{ color: "white", padding: "20px"}}>
-          <h2>Getting Started</h2>
-          <h3>1. Finalize Your Profile</h3>
-            <p>
-              You should have already filled out your profile information and preferences, but sometimes you might want to update them! 
-              Just click on the "Profile" tab in the navigation bar to edit your information and preferences. This helps us find better matches for you.
-              <br></br>
-              <br></br>
-              To edit, scroll down to Profile Info or click on Preferences:   
-            </p>
-            <img style={{ marginBottom: '50px' }} src={tutorial_1} alt="Update Info" />
+        <div className="walkthrough">
+          <h2 className="walkthrough-title">Getting Started</h2>
+
+          <div className="walkthrough-section">
+            <h3 className="walkthrough-step">1. Finalize Your Profile</h3>
+            <p>You should have already filled out your profile information and preferences, but sometimes you might want to update them. Just click on the "Profile" tab in the navigation bar to edit your information and preferences. This helps us find better matches for you.</p>
+            <p>To edit, scroll down to Profile Info or click on Preferences:</p>
+            <img className="walkthrough-img" src={tutorial_1} alt="Update Info" />
             <p>Update the desired field(s):</p>
-            <img style={{ marginBottom: '50px' }} src={tutorial_2} alt="Menu Selection" />
+            <img className="walkthrough-img" src={tutorial_2} alt="Menu Selection" />
             <p>Then click Save:</p>
-            <img style={{ marginBottom: '50px' }} src={tutorial_3} alt="Save Changes" />
-            <p>You can prioritize your preferences by checking the "Priority" box next to each one (visible as a star next to the preference). 
-              This will make them more important in the matching algorithm.
-            </p>
-          <h3>2. Find Your Perfect Roommate</h3>
-            <p>
-              Click on the "Explore and Connect" tab to see potential matches. Each profile will show you their basic info, 
-              preferences, and a compatibility score based on how well your preferences align.  
-            </p>
-            <img style={{ marginBottom: '50px' }} src={tutorial_4} alt="Explore Matches" />
-            <p>
-              If you find someone interesting, click the "Match" button on their profile. This will send them a match request. 
-              If they accept, you'll be able to chat and get to know each other better! Otherwise, click skip and keep exploring other profiles.
-            </p>
-          <h3>3. Start Chatting!</h3>
-            <p>
-              Once you have successfully matched with someone, you can start chatting with them! Just click on the "Chat" tab to see all your matches and conversations.
-            </p>
-            <img style={{ marginBottom: '50px' }} src={tutorial_5} alt="Start Chatting" />
-          <h3>4. Check Notifications</h3>
-            <p>
-              Don't forget to check your notifications! This is where you'll see updates about new matches, messages, and other important info. 
-              Just click on the "Notifications" tab to stay in the loop.
-            </p>
-            <img style={{ marginBottom: '50px' }} src={tutorial_6} alt="Check Notifications" />
-          <h3>5. Other Features</h3>
-            <p>
-              There is a checklist feature to help you stay organized for move-in day. You can find it in the navigation bar as well. You can add whatever items you want 
-              to the checklist and check them off as you get them. It's a great way to make sure you don't forget anything important!
-            </p>
-            <img style={{ marginBottom: '50px' }} src={tutorial_7} alt="Checklist" />
-            <p>
-              Under the Groups tab, you can see the other people that you have matched with. These are the people that you will (hopefully) be living with, so it's a good idea 
-              to check out their profiles and get to know them before move-in day. You can also chat with them in the Chat tab.
-            </p>
-            <img src={tutorial_8} alt="Groups" />
-            <img style={{ marginBottom: '50px' }} src={tutorial_9} alt="Groups 2" />
-            <p>
-              If you end up deciding that you don't want to be in a group anymore, you can click the "Leave Group" button in the Group tab. 
-              This will remove you from the group and allow you to explore other matches.
-            </p>
-            <img style={{ marginBottom: '50px' }} src={tutorial_10} alt="Leave Group" />
+            <img className="walkthrough-img" src={tutorial_3} alt="Save Changes" />
+            <p>You can prioritize your preferences by checking the "Priority" box next to each one (visible as a star next to the preference). This will make them more important in the matching algorithm.</p>
+          </div>
+
+          <div className="walkthrough-section">
+            <h3 className="walkthrough-step">2. Find Your Perfect Roommate</h3>
+            <p>Click on the "Explore and Connect" tab to see potential matches. Each profile will show you their basic info, preferences, and a compatibility score based on how well your preferences align.</p>
+            <img className="walkthrough-img" src={tutorial_4} alt="Explore Matches" />
+            <p>If you find someone interesting, click the "Match" button on their profile. This will send them a match request. If they accept, you'll be able to chat and get to know each other better. Otherwise, click Skip and keep exploring.</p>
+          </div>
+
+          <div className="walkthrough-section">
+            <h3 className="walkthrough-step">3. Start Chatting!</h3>
+            <p>Once you have successfully matched with someone, you can start chatting with them. Just click on the "Chat" tab to see all your matches and conversations.</p>
+            <img className="walkthrough-img" src={tutorial_5} alt="Start Chatting" />
+          </div>
+
+          <div className="walkthrough-section">
+            <h3 className="walkthrough-step">4. Check Notifications</h3>
+            <p>Don't forget to check your notifications! This is where you'll see incoming match requests. Just click on the "Notifications" tab to stay in the loop.</p>
+            <img className="walkthrough-img" src={tutorial_6} alt="Check Notifications" />
+          </div>
+
+          <div className="walkthrough-section">
+            <h3 className="walkthrough-step">5. Other Features</h3>
+            <p>The Checklist page helps you stay organized for move-in day. Add whatever items you want and check them off as you go.</p>
+            <img className="walkthrough-img" src={tutorial_7} alt="Checklist" />
+            <p>Under the Your Group tab, you can see everyone you've matched with. You can also see their checklists to coordinate what everyone is bringing.</p>
+            <img className="walkthrough-img" src={tutorial_8} alt="Groups" />
+            <img className="walkthrough-img" src={tutorial_9} alt="Groups 2" />
+            <p>If you decide you no longer want to be in a group, click the "Leave Group" button to remove yourself and start fresh.</p>
+            <img className="walkthrough-img" src={tutorial_10} alt="Leave Group" />
+          </div>
         </div>
       </div>
   );
